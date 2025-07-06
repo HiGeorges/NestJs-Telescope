@@ -21,8 +21,19 @@ let TelescopeController = class TelescopeController {
     constructor(telescopeService) {
         this.telescopeService = telescopeService;
     }
-    async getInterface(res) {
+    async serveIndex(res) {
         res.sendFile('index.html', { root: (0, path_1.join)(__dirname, '..', 'public') });
+    }
+    async serveAssets(req, res) {
+        const assetPath = req.url.replace(/^\/telescope\/assets\//, '');
+        const fullPath = (0, path_1.join)(__dirname, '..', 'public', 'assets', assetPath);
+        res.sendFile(fullPath, (err) => {
+            if (err)
+                res.status(404).send('Asset not found');
+        });
+    }
+    async serveViteSvg(res) {
+        res.sendFile('vite.svg', { root: (0, path_1.join)(__dirname, '..', 'public') });
     }
     getEntries() {
         return this.telescopeService.getEntries();
@@ -46,7 +57,22 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], TelescopeController.prototype, "getInterface", null);
+], TelescopeController.prototype, "serveIndex", null);
+__decorate([
+    (0, common_1.Get)('assets/*'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], TelescopeController.prototype, "serveAssets", null);
+__decorate([
+    (0, common_1.Get)('vite.svg'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], TelescopeController.prototype, "serveViteSvg", null);
 __decorate([
     (0, common_1.Get)('api/entries'),
     __metadata("design:type", Function),
