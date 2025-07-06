@@ -1,0 +1,51 @@
+# Code Owners for NestJS Telescope
+# This file defines who is responsible for different parts of the codebase
+
+# Global project maintainer
+* @HiGeorges
+
+# Core package (NestJS backend)
+/packages/core/ @HiGeorges
+
+# UI package (React frontend)
+/packages/ui/ @HiGeorges
+
+# Demo application
+/apps/demo/ @HiGeorges
+
+# Documentation
+*.md @HiGeorges
+/docs/ @HiGeorges
+
+# Configuration files
+package.json @HiGeorges
+tsconfig.json @HiGeorges
+vite.config.ts @HiGeorges
+tailwind.config.js @HiGeorges
+postcss.config.js @HiGeorges
+
+# GitHub workflows and configuration
+/.github/ @HiGeorges
+
+# Build and deployment scripts
+/scripts/ @HiGeorges
+
+# Type definitions
+*.d.ts @HiGeorges
+
+# Test files
+*.test.ts @HiGeorges
+*.test.tsx @HiGeorges
+*.spec.ts @HiGeorges
+*.spec.tsx @HiGeorges
+
+# Configuration files
+.env* @HiGeorges
+.gitignore @HiGeorges
+.npmrc @HiGeorges
+.yarnrc @HiGeorges
+
+# Dependencies
+package-lock.json @HiGeorges
+yarn.lock @HiGeorges
+pnpm-lock.yaml @HiGeorges 

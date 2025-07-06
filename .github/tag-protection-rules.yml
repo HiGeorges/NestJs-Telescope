@@ -1,0 +1,87 @@
+# Tag Protection Rules for NestJS Telescope
+# This file defines rules for tag creation and management
+
+# Rule 1: Require pull request reviews before merging
+# This ensures code quality and prevents direct pushes to main
+rule:
+  - name: "Require pull request reviews before merging"
+    pattern: "v*"  # Applies to all version tags (v1.0.0, v1.1.0, etc.)
+    required_review_count: 1
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: false
+    require_last_push_approval: true
+
+# Rule 2: Require status checks to pass before merging
+# This ensures tests and builds pass before release
+rule:
+  - name: "Require status checks to pass before merging"
+    pattern: "v*"
+    required_status_checks:
+      - "build"
+      - "test"
+      - "lint"
+    strict_required_status_checks_policy: true
+
+# Rule 3: Require branches to be up to date before merging
+# This prevents conflicts and ensures latest code
+rule:
+  - name: "Require branches to be up to date before merging"
+    pattern: "v*"
+    require_branches_to_be_up_to_date: true
+
+# Rule 4: Restrict pushes that create tags
+# Only allow tag creation through releases or specific workflows
+rule:
+  - name: "Restrict tag creation"
+    pattern: "v*"
+    restrict_pushes: true
+    allowed_actors:
+      - "HiGeorges"  # Your GitHub username
+      - "dependabot[bot]"  # Allow Dependabot for security updates
+
+# Rule 5: Require linear history
+# This keeps the git history clean and linear
+rule:
+  - name: "Require linear history"
+    pattern: "v*"
+    require_linear_history: true
+
+# Rule 6: Allow force pushes for specific users
+# Useful for fixing release tags if needed
+rule:
+  - name: "Allow force pushes for maintainers"
+    pattern: "v*"
+    allow_force_pushes: true
+    allowed_actors:
+      - "HiGeorges"
+
+# Rule 7: Allow deletions for maintainers
+# Useful for cleaning up incorrect tags
+rule:
+  - name: "Allow tag deletions for maintainers"
+    pattern: "v*"
+    allow_deletions: true
+    allowed_actors:
+      - "HiGeorges"
+
+# Rule 8: Block creation of tags that don't follow semantic versioning
+# This ensures consistent versioning
+rule:
+  - name: "Enforce semantic versioning"
+    pattern: "v*"
+    required_pattern: "v[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9.-]+)?(\\+[a-zA-Z0-9.-]+)?"
+    error_message: "Tags must follow semantic versioning (e.g., v1.0.0, v1.1.0-alpha.1)"
+
+# Rule 9: Require signed commits for releases
+# This adds security to release tags
+rule:
+  - name: "Require signed commits for releases"
+    pattern: "v*"
+    require_signed_commits: true
+
+# Rule 10: Block creation of tags on non-main branches
+# This prevents accidental releases from feature branches
+rule:
+  - name: "Only allow tags from main branch"
+    pattern: "v*"
+    required_head_ref: "main" 

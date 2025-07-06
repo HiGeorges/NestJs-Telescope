@@ -1,0 +1,172 @@
+# Branch Protection Rules for NestJS Telescope
+# This file defines rules for branch protection and management
+
+# Main branch protection rules
+rule:
+  - name: "Main branch protection"
+    pattern: "main"
+    
+    # Require pull request reviews before merging
+    required_review_count: 1
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: false
+    require_last_push_approval: true
+    
+    # Require status checks to pass before merging
+    required_status_checks:
+      - "build"
+      - "test"
+      - "lint"
+    strict_required_status_checks_policy: true
+    
+    # Require branches to be up to date before merging
+    require_branches_to_be_up_to_date: true
+    
+    # Restrict pushes to main branch
+    restrict_pushes: true
+    allowed_actors:
+      - "HiGeorges"  # Your GitHub username
+      - "dependabot[bot]"  # Allow Dependabot for security updates
+    
+    # Require linear history
+    require_linear_history: true
+    
+    # Allow force pushes for maintainers (useful for fixing commits)
+    allow_force_pushes: true
+    allowed_actors:
+      - "HiGeorges"
+    
+    # Allow deletions for maintainers
+    allow_deletions: true
+    allowed_actors:
+      - "HiGeorges"
+    
+    # Require signed commits for security
+    require_signed_commits: true
+    
+    # Block creation of tags on non-main branches
+    required_head_ref: "main"
+
+# Development branch protection rules
+rule:
+  - name: "Development branch protection"
+    pattern: "develop"
+    
+    # Require pull request reviews before merging
+    required_review_count: 1
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: false
+    require_last_push_approval: true
+    
+    # Require status checks to pass before merging
+    required_status_checks:
+      - "build"
+      - "test"
+      - "lint"
+    strict_required_status_checks_policy: true
+    
+    # Require branches to be up to date before merging
+    require_branches_to_be_up_to_date: true
+    
+    # Allow force pushes for maintainers
+    allow_force_pushes: true
+    allowed_actors:
+      - "HiGeorges"
+    
+    # Allow deletions for maintainers
+    allow_deletions: true
+    allowed_actors:
+      - "HiGeorges"
+
+# Feature branch rules (for contributors)
+rule:
+  - name: "Feature branch rules"
+    pattern: "feature/*"
+    
+    # Require pull request reviews before merging
+    required_review_count: 1
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: false
+    require_last_push_approval: true
+    
+    # Require status checks to pass before merging
+    required_status_checks:
+      - "build"
+      - "test"
+      - "lint"
+    strict_required_status_checks_policy: true
+    
+    # Require branches to be up to date before merging
+    require_branches_to_be_up_to_date: true
+    
+    # Allow force pushes for maintainers
+    allow_force_pushes: true
+    allowed_actors:
+      - "HiGeorges"
+    
+    # Allow deletions for maintainers
+    allow_deletions: true
+    allowed_actors:
+      - "HiGeorges"
+
+# Hotfix branch rules
+rule:
+  - name: "Hotfix branch rules"
+    pattern: "hotfix/*"
+    
+    # Require pull request reviews before merging
+    required_review_count: 1
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: false
+    require_last_push_approval: true
+    
+    # Require status checks to pass before merging
+    required_status_checks:
+      - "build"
+      - "test"
+      - "lint"
+    strict_required_status_checks_policy: true
+    
+    # Require branches to be up to date before merging
+    require_branches_to_be_up_to_date: true
+    
+    # Allow force pushes for maintainers (important for hotfixes)
+    allow_force_pushes: true
+    allowed_actors:
+      - "HiGeorges"
+    
+    # Allow deletions for maintainers
+    allow_deletions: true
+    allowed_actors:
+      - "HiGeorges"
+
+# Release branch rules
+rule:
+  - name: "Release branch rules"
+    pattern: "release/*"
+    
+    # Require pull request reviews before merging
+    required_review_count: 1
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: false
+    require_last_push_approval: true
+    
+    # Require status checks to pass before merging
+    required_status_checks:
+      - "build"
+      - "test"
+      - "lint"
+    strict_required_status_checks_policy: true
+    
+    # Require branches to be up to date before merging
+    require_branches_to_be_up_to_date: true
+    
+    # Allow force pushes for maintainers
+    allow_force_pushes: true
+    allowed_actors:
+      - "HiGeorges"
+    
+    # Allow deletions for maintainers
+    allow_deletions: true
+    allowed_actors:
+      - "HiGeorges" 
