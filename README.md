@@ -137,6 +137,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
-- **Documentation**: [Full Documentation](https://github.com/your-repo/wiki)
-- **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions) 
+- **Issues**: [GitHub Issues](https://github.com/HiGeorges/NestJs-Telescope/issues)
+- **Documentation**: [Full Documentation](https://github.com/HiGeorges/NestJs-Telescope/wiki)
+- **Discussions**: [GitHub Discussions](https://github.com/HiGeorges/NestJs-Telescope/discussions) 
