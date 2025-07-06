@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Res, UseGuards, Delete, Param } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Get, Res, UseGuards, Delete, Param, Req } from '@nestjs/common';
+import { Response, Request } from 'express';
 import { join } from 'path';
 import { TelescopeService } from './telescope.service';
 import { TelescopeBasicAuthGuard } from './telescope-basic-auth.guard';
@@ -41,10 +41,26 @@ export class TelescopeController {
    * 
    * @param res - Express response object for serving the HTML file
    */
+ 
+
   @Get()
   @UseGuards(TelescopeBasicAuthGuard)
-  async getInterface(@Res() res: Response): Promise<void> {
+  async serveIndex(@Res() res: Response) {
     res.sendFile('index.html', { root: join(__dirname, '..', 'public') });
+  }
+
+  @Get('assets/*')
+  async serveAssets(@Req() req: Request, @Res() res: Response) {
+    const assetPath = req.url.replace(/^\/telescope\/assets\//, '');
+    const fullPath = join(__dirname, '..', 'public', 'assets', assetPath);
+    res.sendFile(fullPath, (err) => {
+      if (err) res.status(404).send('Asset not found');
+    });
+  }
+
+  @Get('vite.svg')
+  async serveViteSvg(@Res() res: Response) {
+    res.sendFile('vite.svg', { root: join(__dirname, '..', 'public') });
   }
 
   /**
