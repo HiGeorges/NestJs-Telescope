@@ -1,5 +1,5 @@
 {
-  "name": "@telescope/core",
+  "name": "nestjs-telescope",
   "version": "1.0.0",
   "description": "A powerful debugging and monitoring tool for NestJS applications, inspired by Laravel Telescope",
   "main": "dist/index.js",
@@ -19,18 +19,19 @@
     "development-tools"
   ],
   "author": {
-    "name": "Your Name",
-    "email": "your.email@example.com"
+    "name": "Georges HELOUSSATO",
+    "email": "georges.heloussato@epitech.eu",
+    "url": "https://github.com/HiGeorges"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/HiGeorges/nestjs-telescope.git"
+    "url": "https://github.com/HiGeorges/NestJs-Telescope.git"
   },
   "bugs": {
-    "url": "https://github.com/HiGeorges/nestjs-telescope/issues"
+    "url": "https://github.com/HiGeorges/NestJs-Telescope/issues"
   },
-  "homepage": "https://github.com/HiGeorges/nestjs-telescope#readme",
+  "homepage": "https://github.com/HiGeorges/NestJs-Telescope#readme",
   "dependencies": {
     "@nestjs/bull": "^11.0.2",
     "@nestjs/cache-manager": "^3.0.1",

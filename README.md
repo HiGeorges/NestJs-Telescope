@@ -2,7 +2,7 @@
 
 A powerful debugging and monitoring tool for NestJS applications, inspired by Laravel Telescope. Provides real-time HTTP request monitoring, exception tracking, and a beautiful web interface for debugging your applications.
 
-[![npm version](https://badge.fury.io/js/@telescope/core.svg)](https://badge.fury.io/js/@telescope/core)
+[![npm version](https://badge.fury.io/js/nestjs-telescope.svg)](https://badge.fury.io/js/nestjs-telescope)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub stars](https://img.shields.io/github/stars/HiGeorges/NestJs-Telescope.svg)](https://github.com/HiGeorges/NestJs-Telescope/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/HiGeorges/NestJs-Telescope.svg)](https://github.com/HiGeorges/NestJs-Telescope/network)
@@ -23,14 +23,14 @@ A powerful debugging and monitoring tool for NestJS applications, inspired by La
 ### Installation
 
 ```bash
-npm install @telescope/core
+npm install nestjs-telescope
 ```
 
 ### Basic Setup
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { TelescopeModule } from '@telescope/core';
+import { TelescopeModule } from 'nestjs-telescope';
 
 @Module({
   imports: [
@@ -71,7 +71,7 @@ interface TelescopeConfig {
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { TelescopeModule } from '@telescope/core';
+import { TelescopeModule } from 'nestjs-telescope';
 
 @Module({
   imports: [
