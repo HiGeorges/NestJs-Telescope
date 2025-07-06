@@ -1,18 +1,33 @@
 {
-  "name": "nestjs-scope-final",
+  "name": "nestjs-telescope",
   "version": "1.0.0",
-  "private": true,
+  "private": false,
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
-  "description": "",
+  "description": "A debugging and monitoring tool for NestJS applications, inspired by Laravel Telescope",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "keywords": [
+    "nestjs",
+    "telescope",
+    "debugging",
+    "monitoring",
+    "logging",
+    "development-tools"
+  ],
+  "author": "Georges",
+  "license": "MIT",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/nestjs-telescope.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/nestjs-telescope/issues"
+  },
+  "homepage": "https://github.com/yourusername/nestjs-telescope#readme"
 }
