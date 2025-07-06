@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NestJS Telescope - Debug Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header h1::before {
+            content: "🔭";
+            font-size: 1.2em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #2c3e50;
+        }
+
+        .clear-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: #e74c3c;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .entries-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .entry {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+
+        .entry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .entry.exception {
+            border-left-color: #e74c3c;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .entry-type {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .entry-type.request {
+            background: #667eea;
+            color: white;
+        }
+
+        .entry-type.exception {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .entry-method {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            background: #27ae60;
+            color: white;
+        }
+
+        .entry-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .entry-status.success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .entry-status.error {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .entry-status.warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .entry-url {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #2c3e50;
+            word-break: break-all;
+            margin-bottom: 10px;
+        }
+
+        .entry-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .detail-value {
+            font-size: 0.9em;
+            color: #2c3e50;
+            word-break: break-all;
+        }
+
+        .view-details-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8em;
+        }
+
+        .view-details-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #2c3e50;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .json-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+            }
+
+            .entry-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Auto-refresh indicator */
+        .refresh-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-size: 0.8em;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="refresh-indicator">
+        <span id="lastUpdate">Auto-refresh enabled</span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>NestJS Telescope</h1>
+            <p>Real-time debugging and monitoring interface</p>
+            
+            <div class="stats-grid" id="statsGrid">
+                <!-- Stats will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="requests">Requests</button>
+                <button class="filter-btn" data-filter="exceptions">Exceptions</button>
+                <button class="clear-btn" onclick="clearEntries()">Clear All</button>
+            </div>
+        </div>
+
+        <div class="entries-container" id="entriesContainer">
+            <div class="empty-state">
+                <h3>No entries yet</h3>
+                <p>Make some requests to your application to see them appear here</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for detailed view -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Entry Details</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody">
+                <!-- Modal content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+        let entries = [];
+        let stats = {};
+
+        // Initialize the interface
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            setupEventListeners();
+            startAutoRefresh();
+        });
+
+        function setupEventListeners() {
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    renderEntries();
+                });
+            });
+        }
+
+        function startAutoRefresh() {
+            setInterval(loadData, 2000); // Refresh every 2 seconds
+        }
+
+        async function loadData() {
+            try {
+                const [entriesResponse, statsResponse] = await Promise.all([
+                    fetch('/telescope/api/entries'),
+                    fetch('/telescope/api/stats')
+                ]);
+
+                if (entriesResponse.ok) {
+                    entries = await entriesResponse.json();
+                }
+
+                if (statsResponse.ok) {
+                    stats = await statsResponse.json();
+                }
+
+                renderStats();
+                renderEntries();
+                updateLastUpdate();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        function renderStats() {
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.totalEntries || 0}</div>
+                    <div class="stat-label">Total Entries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.requests || 0}</div>
+                    <div class="stat-label">Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.exceptions || 0}</div>
+                    <div class="stat-label">Exceptions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.uniqueIPs || 0}</div>
+                    <div class="stat-label">Unique IPs</div>
+                </div>
+            `;
+        }
+
+        function renderEntries() {
+            const container = document.getElementById('entriesContainer');
+            const filteredEntries = filterEntries(entries, currentFilter);
+
+            if (filteredEntries.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No ${currentFilter === 'all' ? '' : currentFilter} entries</h3>
+                        <p>${currentFilter === 'all' ? 'Make some requests to your application to see them appear here' : `No ${currentFilter} found`}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredEntries.map(entry => renderEntry(entry)).join('');
+        }
+
+        function filterEntries(entries, filter) {
+            if (filter === 'all') return entries;
+            if (filter === 'requests') return entries.filter(entry => entry.type === 'request');
+            if (filter === 'exceptions') return entries.filter(entry => entry.type === 'exception');
+            return entries;
+        }
+
+        function renderEntry(entry) {
+            const isException = entry.type === 'exception';
+            const statusClass = getStatusClass(entry.statusCode || entry.status);
+            
+            return `
+                <div class="entry ${isException ? 'exception' : ''}">
+                    <div class="entry-header">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span class="entry-type ${entry.type}">${entry.type}</span>
+                            ${!isException ? `<span class="entry-method">${entry.method}</span>` : ''}
+                            ${entry.statusCode || entry.status ? `<span class="entry-status ${statusClass}">${entry.statusCode || entry.status}</span>` : ''}
+                        </div>
+                        <span style="color: #6c757d; font-size: 0.8em;">
+                            ${new Date(entry.timestamp).toLocaleString()}
+                        </span>
+                    </div>
+                    
+                    <div class="entry-url">${entry.url || entry.path}</div>
+                    
+                    ${!isException ? `
+                        <div class="entry-details">
+                            <div class="detail-item">
+                                <div class="detail-label">IP Address</div>
+                                <div class="detail-value">${entry.ip || 'Unknown'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">User Agent</div>
+                                <div class="detail-value">${entry.userAgent || 'Unknown'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Duration</div>
+                                <div class="detail-value">${entry.duration || 'N/A'}ms</div>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="entry-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Exception</div>
+                                <div class="detail-value">${entry.name || 'Unknown Error'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Message</div>
+                                <div class="detail-value">${entry.message || 'No message'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">IP Address</div>
+                                <div class="detail-value">${entry.ip || 'Unknown'}</div>
+                            </div>
+                        </div>
+                    `}
+                    
+                    <button class="view-details-btn" onclick="showDetails('${entry.id}')">
+                        View Details
+                    </button>
+                </div>
+            `;
+        }
+
+        function getStatusClass(status) {
+            if (status >= 200 && status < 300) return 'success';
+            if (status >= 400 && status < 500) return 'warning';
+            if (status >= 500) return 'error';
+            return '';
+        }
+
+        async function showDetails(entryId) {
+            try {
+                const response = await fetch(`/telescope/api/entries/${entryId}`);
+                if (response.ok) {
+                    const entry = await response.json();
+                    showModal(entry);
+                }
+            } catch (error) {
+                console.error('Error loading entry details:', error);
+            }
+        }
+
+        function showModal(entry) {
+            const modal = document.getElementById('detailsModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            modalTitle.textContent = `${entry.type.charAt(0).toUpperCase() + entry.type.slice(1)} Details`;
+
+            let modalContent = `
+                <div class="modal-section">
+                    <h3>Basic Information</h3>
+                    <div class="json-display">${JSON.stringify({
+                        id: entry.id,
+                        type: entry.type,
+                        timestamp: entry.timestamp,
+                        url: entry.url || entry.path,
+                        method: entry.method,
+                        statusCode: entry.statusCode || entry.status,
+                        duration: entry.duration,
+                        ip: entry.ip,
+                        userAgent: entry.userAgent
+                    }, null, 2)}</div>
+                </div>
+            `;
+
+            if (entry.type === 'request') {
+                modalContent += `
+                    <div class="modal-section">
+                        <h3>Request Details</h3>
+                        <div class="json-display">${JSON.stringify({
+                            headers: entry.headers,
+                            cookies: entry.cookies,
+                            query: entry.query,
+                            params: entry.params,
+                            body: entry.body
+                        }, null, 2)}</div>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3>Response Details</h3>
+                        <div class="json-display">${JSON.stringify({
+                            responseHeaders: entry.responseHeaders,
+                            responseBody: entry.responseBody,
+                            responseSize: entry.responseSize
+                        }, null, 2)}</div>
+                    </div>
+                `;
+            }
+
+            if (entry.type === 'exception') {
+                modalContent += `
+                    <div class="modal-section">
+                        <h3>Exception Details</h3>
+                        <div class="json-display">${JSON.stringify({
+                            name: entry.name,
+                            message: entry.message,
+                            stack: entry.stack
+                        }, null, 2)}</div>
+                    </div>
+                `;
+            }
+
+            modalBody.innerHTML = modalContent;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        async function clearEntries() {
+            if (!confirm('Are you sure you want to clear all entries?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/telescope/api/entries', {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    entries = [];
+                    renderEntries();
+                    loadData(); // Refresh stats
+                }
+            } catch (error) {
+                console.error('Error clearing entries:', error);
+            }
+        }
+
+        function updateLastUpdate() {
+            const lastUpdate = document.getElementById('lastUpdate');
+            lastUpdate.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailsModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
