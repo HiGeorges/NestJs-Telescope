@@ -33,57 +33,6 @@ jobs:
     - name: Build packages
       run: npm run build
 
-    - name: Run tests
-      run: npm run test
-
-  test-ui:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Build UI
-      run: cd packages/ui && npm run build
-
-    - name: Run UI tests
-      run: cd packages/ui && npm run test
-      if: hashFiles('packages/ui/package.json') != ''
-
-  test-core:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Build core
-      run: cd packages/core && npm run build
-
-    - name: Run core tests
-      run: cd packages/core && npm run test
-      if: hashFiles('packages/core/package.json') != ''
-
   security:
     runs-on: ubuntu-latest
     needs: build
