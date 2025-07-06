@@ -1,6 +1,6 @@
 {
   "name": "nestjs-telescope",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A debugging and monitoring tool for NestJS applications, inspired by Laravel Telescope",
   "main": "packages/core/dist/index.js",
   "types": "packages/core/dist/index.d.ts",
