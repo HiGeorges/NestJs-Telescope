@@ -44,19 +44,19 @@ export class TelescopeInterceptor implements NestInterceptor {
         
         // Capture detailed request information
         const requestDetails: RequestDetails = {
-          method: request.method,
-          url: request.url,
-          path: request.path || request.url,
+          method: request.method || 'UNKNOWN',
+          url: request.url || '',
+          path: request.path || request.url || '',
           query: request.query || {},
           params: request.params || {},
-          headers: this.sanitizeHeaders(request.headers),
+          headers: this.sanitizeHeaders(request.headers || {}),
           cookies: request.cookies || {},
           body: this.sanitizeBody(request.body),
           ip: this.getClientIP(request),
-          userAgent: request.headers['user-agent'] || 'Unknown',
-          referer: request.headers.referer,
-          origin: request.headers.origin,
-          hostname: request.hostname || request.headers.host || 'Unknown',
+          userAgent: request.headers?.['user-agent'] || 'Unknown',
+          referer: request.headers?.referer,
+          origin: request.headers?.origin,
+          hostname: request.hostname || request.headers?.host || 'Unknown',
           protocol: request.protocol || 'http',
           timestamp: new Date(),
         };
@@ -78,19 +78,19 @@ export class TelescopeInterceptor implements NestInterceptor {
         
         // Capture request details for exception
         const requestDetails: RequestDetails = {
-          method: request.method,
-          url: request.url,
-          path: request.path || request.url,
+          method: request.method || 'UNKNOWN',
+          url: request.url || '',
+          path: request.path || request.url || '',
           query: request.query || {},
           params: request.params || {},
-          headers: this.sanitizeHeaders(request.headers),
+          headers: this.sanitizeHeaders(request.headers || {}),
           cookies: request.cookies || {},
           body: this.sanitizeBody(request.body),
           ip: this.getClientIP(request),
-          userAgent: request.headers['user-agent'] || 'Unknown',
-          referer: request.headers.referer,
-          origin: request.headers.origin,
-          hostname: request.hostname || request.headers.host || 'Unknown',
+          userAgent: request.headers?.['user-agent'] || 'Unknown',
+          referer: request.headers?.referer,
+          origin: request.headers?.origin,
+          hostname: request.hostname || request.headers?.host || 'Unknown',
           protocol: request.protocol || 'http',
           timestamp: new Date(),
         };
@@ -136,10 +136,13 @@ export class TelescopeInterceptor implements NestInterceptor {
    * @returns Client IP address
    */
   private getClientIP(request: any): string {
+    const xForwardedFor = request.headers['x-forwarded-for'];
+    const forwardedIP = xForwardedFor ? xForwardedFor.split(',')[0]?.trim() : null;
+    
     return request.ip || 
            request.connection?.remoteAddress || 
            request.socket?.remoteAddress || 
-           request.headers['x-forwarded-for']?.split(',')[0] || 
+           forwardedIP || 
            request.headers['x-real-ip'] || 
            'Unknown';
   }
@@ -153,10 +156,14 @@ export class TelescopeInterceptor implements NestInterceptor {
     const sanitized: Record<string, string> = {};
     const sensitiveHeaders = ['authorization', 'cookie', 'x-api-key', 'x-auth-token'];
 
+    if (!headers || typeof headers !== 'object') {
+      return sanitized;
+    }
+
     for (const [key, value] of Object.entries(headers)) {
-      if (sensitiveHeaders.includes(key.toLowerCase())) {
+      if (key && sensitiveHeaders.includes(key.toLowerCase())) {
         sanitized[key] = '[REDACTED]';
-      } else {
+      } else if (key && value !== undefined && value !== null) {
         sanitized[key] = String(value);
       }
     }
