@@ -29,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/yourusername/nestjs-telescope/issues"
   },
-  "homepage": "https://github.com/yourusername/nestjs-telescope#readme"
+  "homepage": "https://github.com/yourusername/nestjs-telescope#readme",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11"
+  }
 }
