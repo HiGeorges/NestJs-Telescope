@@ -1,129 +1,167 @@
-# NestJS Telescope
+# NestJS Telescope 🔭
 
-A powerful debugging and monitoring tool for NestJS applications, inspired by Laravel Telescope. Provides real-time HTTP request monitoring, exception tracking, and a beautiful web interface.
+A powerful debugging and monitoring tool for NestJS applications, inspired by Laravel Telescope. Provides real-time HTTP request monitoring, exception tracking, and a beautiful web interface for debugging your applications.
 
-## 🚀 Features
+[![npm version](https://badge.fury.io/js/@telescope/core.svg)](https://badge.fury.io/js/@telescope/core)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/HiGeorges/NestJs-Telescope.svg)](https://github.com/HiGeorges/NestJs-Telescope/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/HiGeorges/NestJs-Telescope.svg)](https://github.com/HiGeorges/NestJs-Telescope/network)
 
-- **Real-time HTTP Request Monitoring** - Track all incoming requests with detailed information
-- **Exception Tracking** - Capture and display exceptions with stack traces
-- **Beautiful Web Interface** - Modern, responsive UI with real-time updates
-- **Optional Authentication** - Basic Auth protection for production environments
-- **Performance Metrics** - Request duration, status codes, and statistics
-- **Zero Configuration** - Works out of the box with minimal setup
-- **TypeScript Support** - Full TypeScript support with type definitions
+## ✨ Features
 
-## 📦 Installation
+- **🔍 Real-time HTTP Monitoring**: Capture and inspect all HTTP requests and responses
+- **🚨 Exception Tracking**: Detailed stack traces and error information
+- **📊 Live Statistics**: Real-time metrics and performance analytics
+- **🎨 Beautiful UI**: Modern React-based interface with dark mode support
+- **🔐 Optional Authentication**: Basic auth protection for sensitive environments
+- **⚡ High Performance**: Minimal overhead with efficient data storage
+- **🔧 Easy Integration**: Simple setup with NestJS applications
+- **📱 Responsive Design**: Works seamlessly on desktop and mobile
+
+## 🚀 Quick Start
+
+### Installation
 
 ```bash
 npm install @telescope/core
 ```
 
-## 🔧 Quick Start
-
-### 1. Import the Module
+### Basic Setup
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { NestTelescopeModule } from '@telescope/core';
+import { TelescopeModule } from '@telescope/core';
 
 @Module({
   imports: [
-    NestTelescopeModule,
+    TelescopeModule,
+    // ... your other modules
   ],
-  // ... other modules
 })
 export class AppModule {}
 ```
 
-### 2. Access the Interface
+### Access the Dashboard
 
-Start your application and visit:
-```
-http://localhost:3000/telescope
-```
+Once configured, visit `http://localhost:3000/telescope` to access the debugging interface.
 
-That's it! You'll see a beautiful interface showing all your HTTP requests and exceptions in real-time.
+## 📖 Documentation
 
-## 🔐 Authentication (Optional)
+### Configuration Options
 
-By default, Telescope is **not protected**. To enable Basic Auth:
-
-### Environment Variables
-
-```bash
-# Enable authentication
-TELESCOPE_AUTH_ENABLED=true
-
-# Set credentials
-TELESCOPE_USER=your_username
-TELESCOPE_PASS=your_password
-```
-
-### Example with .env file
-
-```env
-# Telescope Configuration
-TELESCOPE_AUTH_ENABLED=true
-TELESCOPE_USER=admin
-TELESCOPE_PASS=secret123
+```typescript
+interface TelescopeConfig {
+  enabled?: boolean;                    // Enable/disable telescope
+  auth?: {                              // Basic auth credentials
+    username: string;
+    password: string;
+  };
+  maxEntries?: number;                  // Maximum entries to store (default: 1000)
+  autoClearAfter?: number;              // Auto-clear after time in ms
+  captureRequestBody?: boolean;         // Capture request bodies
+  captureResponseBody?: boolean;        // Capture response bodies
+  captureHeaders?: boolean;             // Capture headers
+  captureQuery?: boolean;               // Capture query parameters
+  captureIP?: boolean;                  // Capture IP addresses
+  captureUserAgent?: boolean;           // Capture user agents
+}
 ```
 
-## 📊 API Endpoints
+### Advanced Usage
 
-### GET /telescope
-Serves the web interface.
+```typescript
+import { Module } from '@nestjs/common';
+import { TelescopeModule } from '@telescope/core';
 
-### GET /telescope/api/entries
-Returns all captured requests and exceptions.
+@Module({
+  imports: [
+    TelescopeModule,
+  ],
+  providers: [
+    // Your custom providers
+  ],
+})
+export class AppModule {}
+```
 
-### GET /telescope/api/stats
-Returns statistics about captured data.
+### API Endpoints
+
+The module provides the following REST endpoints:
+
+- `GET /telescope` - Web interface
+- `GET /telescope/api/entries` - List all entries
+- `GET /telescope/api/entries/:id` - Get specific entry
+- `GET /telescope/api/stats` - Get statistics
+- `DELETE /telescope/api/entries` - Clear all entries
+
+## 🎯 Use Cases
+
+- **Development Debugging**: Monitor API calls during development
+- **Production Monitoring**: Track errors and performance in production
+- **API Testing**: Inspect request/response data for testing
+- **Performance Analysis**: Analyze response times and bottlenecks
+- **Security Auditing**: Monitor suspicious requests and patterns
 
 ## 🛠️ Development
 
-This is a monorepo containing:
+### Prerequisites
 
-- `packages/core` - The main Telescope package
-- `apps/demo` - Demo application for testing
+- Node.js >= 18.0.0
+- npm >= 8.0.0
 
-### Building
+### Setup
 
 ```bash
-# Build the core package
-cd packages/core
+# Clone the repository
+git clone https://github.com/HiGeorges/NestJs-Telescope.git
+cd NestJs-Telescope
+
+# Install dependencies
+npm install
+
+# Build all packages
 npm run build
 
-# Run the demo app
-cd apps/demo
-npm run start:dev
+# Start development
+npm run dev
 ```
 
-## 🔒 Security Considerations
+### Project Structure
 
-- **Development**: Authentication is disabled by default for easy development
-- **Production**: Always enable authentication with strong credentials
-- **Environment Variables**: Use environment variables for credentials, never hardcode them
-- **Network Access**: Consider network-level protection for production deployments
+```
+├── packages/
+│   ├── core/           # NestJS backend module
+│   │   ├── src/
+│   │   └── dist/
+│   └── ui/            # React frontend
+│       ├── src/
+│       └── dist/
+├── apps/
+│   └── demo/          # Demo application
+└── README.md
+```
 
-## 🎨 Interface Features
+### Available Scripts
 
-- **Real-time Updates**: Auto-refreshes every 2 seconds
-- **Request Details**: Method, path, status, duration, headers, body
-- **Exception Tracking**: Error messages, stack traces, status codes
-- **Statistics Dashboard**: Total requests, success/error rates, average response time
-- **Responsive Design**: Works on desktop and mobile devices
-- **Modern UI**: Clean, professional interface
-
-## 📈 Performance
-
-- **Lightweight**: Minimal performance impact on your application
-- **Memory Efficient**: Automatically limits stored entries to prevent memory issues
-- **Fast**: Optimized for real-time data display
-- **Non-blocking**: All operations are asynchronous
+```bash
+npm run build          # Build all packages
+npm run dev            # Start development server
+npm run test           # Run all tests
+npm run lint           # Lint all packages
+npm run clean          # Clean build artifacts
+```
 
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
@@ -132,11 +170,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - Inspired by [Laravel Telescope](https://laravel.com/docs/telescope)
-- Built with [NestJS](https://nestjs.com/)
-- Modern UI with vanilla HTML/CSS/JavaScript
+- Built with [NestJS](https://nestjs.com/) and [React](https://reactjs.org/)
+- Styled with [Tailwind CSS](https://tailwindcss.com/)
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/HiGeorges/NestJs-Telescope/issues)
-- **Documentation**: [Full Documentation](https://github.com/HiGeorges/NestJs-Telescope/wiki)
-- **Discussions**: [GitHub Discussions](https://github.com/HiGeorges/NestJs-Telescope/discussions) 
+- 📧 Email: georges.heloussato@epitech.eu
+- 🐛 Issues: [GitHub Issues](https://github.com/HiGeorges/NestJs-Telescope/issues)
+- 📖 Documentation: [GitHub Wiki](https://github.com/HiGeorges/NestJs-Telescope/wiki)
+- 👨‍💻 Author: [HiGeorges](https://github.com/HiGeorges)
+
+---
+
+Made with ❤️ by [Georges HELOUSSATO](https://github.com/HiGeorges) 

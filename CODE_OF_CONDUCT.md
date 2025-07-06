@@ -1,4 +1,4 @@
-# Contributor Covenant Code of Conduct
+# Code of Conduct
 
 ## Our Pledge
 
@@ -57,8 +57,8 @@ an individual is officially representing the community in public spaces.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement at
-georges.heloussato@epitech.eu
-All complaints will be reviewed and investigated promptly and fairly.
+georges.heloussato@epitech.eu. All complaints will be reviewed and
+investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the
 reporter of any incident.
@@ -103,7 +103,7 @@ Violating these terms may lead to a permanent ban.
 ### 4. Permanent Ban
 
 **Community Impact**: Demonstrating a pattern of violation of community
-standards, including sustained inappropriate behavior,  harassment of an
+standards, including sustained inappropriate behavior, harassment of an
 individual, or aggression toward or disparagement of classes of individuals.
 
 **Consequence**: A permanent ban from any sort of public interaction within
@@ -120,4 +120,26 @@ enforcement ladder](https://github.com/mozilla/diversity).
 
 For answers to common questions about this code of conduct, see the FAQ at
 https://www.contributor-covenant.org/faq. Translations are available at
-https://www.contributor-covenant.org/translations. 
+https://www.contributor-covenant.org/translations.
+
+## Contact Information
+
+- **Email**: georges.heloussato@epitech.eu
+- **GitHub Issues**: [GitHub Issues](https://github.com/HiGeorges/NestJs-Telescope/issues)
+- **Project Maintainer**: [HiGeorges](https://github.com/HiGeorges)
+
+## Reporting Guidelines
+
+If you believe someone is violating the code of conduct, we ask that you report it by emailing georges.heloussato@epitech.eu. All reports will be kept confidential.
+
+In your report please include:
+
+- Your contact info (so we can get back to you)
+- Names (real, nicknames, or pseudonyms) of any individuals involved
+- Your account of what occurred, and if you believe the incident is ongoing
+- Any additional context that is available
+- Any supporting documentation (screenshots, etc.)
+
+## License
+
+This Code of Conduct is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 

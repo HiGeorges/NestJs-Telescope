@@ -24,11 +24,11 @@ npm install @telescope/core
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { NestTelescopeModule } from '@telescope/core';
+import { TelescopeModule } from '@telescope/core';
 
 @Module({
   imports: [
-    NestTelescopeModule,
+    TelescopeModule,
   ],
   // ... other modules
 })
@@ -85,11 +85,11 @@ Returns statistics about captured data.
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { NestTelescopeModule } from '@telescope/core';
+import { TelescopeModule } from '@telescope/core';
 
 @Module({
   imports: [
-    NestTelescopeModule,
+    TelescopeModule,
   ],
   providers: [
     // Your custom providers
@@ -143,20 +143,22 @@ export class MyService {
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guide](../../CONTRIBUTING.md) for details.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](../../LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
 - Inspired by [Laravel Telescope](https://laravel.com/docs/telescope)
 - Built with [NestJS](https://nestjs.com/)
-- Modern UI with vanilla HTML/CSS/JavaScript
+- Modern UI with React and Tailwind CSS
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
-- **Documentation**: [Full Documentation](https://github.com/your-repo/wiki)
-- **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions) 
+- **Issues**: [GitHub Issues](https://github.com/HiGeorges/NestJs-Telescope/issues)
+- **Documentation**: [Full Documentation](https://github.com/HiGeorges/NestJs-Telescope/wiki)
+- **Discussions**: [GitHub Discussions](https://github.com/HiGeorges/NestJs-Telescope/discussions)
+- **Email**: georges.heloussato@epitech.eu
+- **Author**: [HiGeorges](https://github.com/HiGeorges) 

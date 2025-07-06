@@ -156,4 +156,11 @@ The UI uses Tailwind CSS for styling with:
 
 ## License
 
-MIT License - see the main project LICENSE file for details.
+MIT License - see the main project [LICENSE](../../LICENSE) file for details.
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/HiGeorges/NestJs-Telescope/issues)
+- **Documentation**: [Full Documentation](https://github.com/HiGeorges/NestJs-Telescope/wiki)
+- **Email**: georges.heloussato@epitech.eu
+- **Author**: [HiGeorges](https://github.com/HiGeorges)

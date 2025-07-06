@@ -1,23 +1,25 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./nest-telescope.module"), exports);
-__exportStar(require("./telescope.service"), exports);
-__exportStar(require("./telescope.controller"), exports);
-__exportStar(require("./telescope-basic-auth.guard"), exports);
-__exportStar(require("./telescope.interceptor"), exports);
-__exportStar(require("./telescope-exception.filter"), exports);
+exports.DEFAULT_TELESCOPE_CONFIG = exports.TelescopeBasicAuthGuard = exports.TelescopeInterceptor = exports.TelescopeService = exports.TelescopeController = exports.TelescopeModule = void 0;
+var nest_telescope_module_1 = require("./nest-telescope.module");
+Object.defineProperty(exports, "TelescopeModule", { enumerable: true, get: function () { return nest_telescope_module_1.NestTelescopeModule; } });
+var telescope_controller_1 = require("./telescope.controller");
+Object.defineProperty(exports, "TelescopeController", { enumerable: true, get: function () { return telescope_controller_1.TelescopeController; } });
+var telescope_service_1 = require("./telescope.service");
+Object.defineProperty(exports, "TelescopeService", { enumerable: true, get: function () { return telescope_service_1.TelescopeService; } });
+var telescope_interceptor_1 = require("./telescope.interceptor");
+Object.defineProperty(exports, "TelescopeInterceptor", { enumerable: true, get: function () { return telescope_interceptor_1.TelescopeInterceptor; } });
+var telescope_basic_auth_guard_1 = require("./telescope-basic-auth.guard");
+Object.defineProperty(exports, "TelescopeBasicAuthGuard", { enumerable: true, get: function () { return telescope_basic_auth_guard_1.TelescopeBasicAuthGuard; } });
+exports.DEFAULT_TELESCOPE_CONFIG = {
+    enabled: true,
+    maxEntries: 1000,
+    autoClearAfter: 24 * 60 * 60 * 1000,
+    captureRequestBody: true,
+    captureResponseBody: true,
+    captureHeaders: true,
+    captureQuery: true,
+    captureIP: true,
+    captureUserAgent: true,
+};
 //# sourceMappingURL=index.js.map
