@@ -1,9 +1,11 @@
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { TelescopeService } from './telescope.service';
 export declare class TelescopeController {
     private readonly telescopeService;
     constructor(telescopeService: TelescopeService);
-    getInterface(res: Response): Promise<void>;
+    serveIndex(res: Response): Promise<void>;
+    serveAssets(req: Request, res: Response): Promise<void>;
+    serveViteSvg(res: Response): Promise<void>;
     getEntries(): import("./telescope.service").TelescopeEntry[];
     getEntry(id: string): import("./telescope.service").TelescopeEntry;
     clearEntries(): {
