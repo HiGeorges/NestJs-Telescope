@@ -46,11 +46,38 @@ export class TelescopeController {
   @Get()
   @UseGuards(TelescopeBasicAuthGuard)
   async serveIndex(@Res() res: Response) {
-    res.sendFile('index.html', { root: join(__dirname, '..', 'public') });
+    try {
+      // Try multiple possible paths for the public directory
+      const possiblePaths = [
+        join(__dirname, '..', 'public'),
+        join(__dirname, 'public'),
+        join(process.cwd(), 'node_modules', 'nestjs-telescope', 'packages', 'core', 'public'),
+        join(process.cwd(), 'node_modules', 'nestjs-telescope', 'dist', 'public')
+      ];
+
+      for (const rootPath of possiblePaths) {
+        try {
+          res.sendFile('index.html', { root: rootPath });
+          return;
+        } catch (fileError) {
+          console.log(`Failed to serve from ${rootPath}:`, fileError.message);
+        }
+      }
+      
+      // If all paths fail, send error
+      res.status(500).send('Telescope interface files not found');
+    } catch (error) {
+      console.error('Error serving Telescope index:', error);
+      res.status(500).send('Error loading Telescope interface');
+    }
   }
 
   @Get('assets/*')
   async serveAssets(@Req() req: Request, @Res() res: Response) {
+    if (!req.url) {
+      return res.status(400).send('Invalid request URL');
+    }
+    
     const assetPath = req.url.replace(/^\/telescope\/assets\//, '');
     const fullPath = join(__dirname, '..', 'public', 'assets', assetPath);
     res.sendFile(fullPath, (err) => {
