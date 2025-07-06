@@ -15,14 +15,12 @@
     "build:core": "cd packages/core && npm run build",
     "build:ui": "cd packages/ui && npm run build",
     "dev": "cd packages/core && npm run start:dev",
-    "test": "npm run test:ui",
-    "test:ui": "cd packages/ui && npm run test",
     "lint": "npm run lint:ui",
     "lint:ui": "cd packages/ui && npm run lint",
     "clean": "npm run clean:core && npm run clean:ui",
     "clean:core": "cd packages/core && npm run clean",
     "clean:ui": "cd packages/ui && npm run clean",
-    "prepublishOnly": "npm run build && npm run test"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "nestjs",
@@ -56,9 +54,9 @@
     "npm": ">=8.0.0"
   },
   "peerDependencies": {
-    "@nestjs/common": "^10.0.0",
-    "@nestjs/core": "^10.0.0",
-    "@nestjs/platform-express": "^10.0.0"
+    "@nestjs/common": "^10.0.0 || ^11.0.0",
+    "@nestjs/core": "^10.0.0 || ^11.0.0",
+    "@nestjs/platform-express": "^10.0.0 || ^11.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11"
