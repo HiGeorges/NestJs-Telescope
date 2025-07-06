@@ -1,69 +1,159 @@
-# React + TypeScript + Vite
+# NestJS Telescope UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern React-based user interface for the NestJS Telescope debugging tool. This package provides a comprehensive web interface for monitoring HTTP requests, responses, and exceptions in real-time.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Real-time Monitoring**: Live updates of HTTP requests and exceptions
+- **Comprehensive Details**: View request/response headers, body, query parameters, and more
+- **Exception Tracking**: Detailed stack traces and error information
+- **Filtering & Search**: Advanced filtering by type, method, status code, and search terms
+- **Statistics Dashboard**: Real-time statistics and performance metrics
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Dark Mode Support**: Built-in theme switching capability
 
-## Expanding the ESLint configuration
+## Architecture
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Project Structure
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── components/          # React components
+│   ├── ui/            # Reusable UI components
+│   │   ├── Button.tsx
+│   │   └── Badge.tsx
+│   ├── RequestsList.tsx
+│   └── RequestDetails.tsx
+├── hooks/              # Custom React hooks
+│   └── useTelescopeData.ts
+├── layouts/            # Layout components
+│   ├── Header.tsx
+│   └── SidebarLayout.tsx
+├── services/           # API services
+│   └── api.ts
+├── types/              # TypeScript type definitions
+│   └── index.ts
+├── App.tsx            # Main application component
+└── main.tsx           # Application entry point
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Key Components
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+#### `RequestsList`
+Displays a filterable list of telescope entries with:
+- Type filtering (requests/exceptions)
+- Method filtering (GET, POST, etc.)
+- Status code filtering
+- Search functionality
+- Sort options
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+#### `RequestDetails`
+Shows detailed information about a selected entry with tabs for:
+- Overview: Basic information and statistics
+- Request: URL, query parameters, and request body
+- Response: Status code, response time, and response body
+- Headers: Request and response headers
+- Body: Request and response body content
+- Exception: Stack trace and error details (for exceptions)
+
+#### `useTelescopeData`
+Custom hook that provides:
+- Real-time data fetching
+- Auto-refresh functionality
+- Error handling
+- Loading states
+- Data management
+
+## Development
+
+### Prerequisites
+
+- Node.js >= 18.0.0
+- npm >= 8.0.0
+
+### Installation
+
+```bash
+npm install
 ```
+
+### Development Server
+
+```bash
+npm run dev
+```
+
+The development server will start at `http://localhost:5173` and automatically rebuild to the backend's public directory.
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+This will build the application and output the files to `../core/public/` for serving by the NestJS backend.
+
+### Code Quality
+
+```bash
+# Lint code
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Type checking
+npm run type-check
+```
+
+### Testing
+
+```bash
+# Run tests
+npm test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+## API Integration
+
+The UI communicates with the NestJS Telescope backend through the following endpoints:
+
+- `GET /telescope/api/entries` - Fetch all entries
+- `GET /telescope/api/entries/:id` - Fetch specific entry
+- `GET /telescope/api/stats` - Fetch statistics
+- `DELETE /telescope/api/entries` - Clear all entries
+
+## TypeScript
+
+The project is fully typed with TypeScript. Key interfaces include:
+
+- `TelescopeEntry` - Main entry type for requests/exceptions
+- `RequestData` - Request-specific data
+- `ResponseData` - Response-specific data
+- `ExceptionData` - Exception-specific data
+- `TelescopeStats` - Statistics data
+
+## Styling
+
+The UI uses Tailwind CSS for styling with:
+- Responsive design
+- Dark mode support
+- Consistent color scheme
+- Accessible components
+
+## Contributing
+
+1. Follow the existing code style and patterns
+2. Add TypeScript types for new features
+3. Include JSDoc comments for public APIs
+4. Write tests for new functionality
+5. Update documentation as needed
+
+## License
+
+MIT License - see the main project LICENSE file for details.

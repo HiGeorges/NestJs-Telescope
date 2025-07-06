@@ -1,101 +1,141 @@
-import { useState, useEffect } from 'react';
+/**
+ * Telescope App Component
+ * 
+ * Main application component for the NestJS Telescope debugging interface.
+ * Provides a comprehensive view of HTTP requests, responses, and exceptions
+ * captured by the Telescope backend with real-time updates and filtering.
+ */
+
+import React, { useState } from 'react';
 import SidebarLayout from './layouts/SidebarLayout';
-import RequestsList from './components/RequestsList';
-import RequestDetails from './components/RequestDetails';
+import Header from './layouts/Header';
+import { RequestsList } from './components/RequestsList';
+import { RequestDetails } from './components/RequestDetails';
+import { useTelescopeData } from './hooks/useTelescopeData';
+import type { TelescopeEntry } from './types';
 
-export interface RequestDetails {
-  method: string;
-  url: string;
-  path: string;
-  query: Record<string, any>;
-  params: Record<string, any>;
-  headers: Record<string, string>;
-  cookies: Record<string, string>;
-  body: any;
-  ip: string;
-  userAgent: string;
-  referer?: string;
-  origin?: string;
-  hostname: string;
-  protocol: string;
-  timestamp: Date;
-}
-
-export interface ResponseDetails {
-  statusCode: number;
-  statusMessage: string;
-  headers: Record<string, string>;
-  body: any;
-  responseTime: number;
-}
-
-export interface TelescopeEntry {
-  id: string;
-  type: 'request' | 'exception';
-  timestamp: Date;
+/**
+ * Telescope App Component
+ */
+export const App: React.FC = () => {
+  // State for selected entry
+  const [selectedEntry, setSelectedEntry] = useState<TelescopeEntry | null>(null);
   
-  // Request details
-  request?: RequestDetails;
-  
-  // Response details (for requests)
-  response?: ResponseDetails;
-  
-  // Legacy fields for backward compatibility
-  method?: string;
-  path?: string;
-  statusCode?: number;
-  duration?: number;
-  message?: string;
-  headers?: Record<string, string>;
-  body?: any;
-  stack?: string;
-}
+  // Custom hook for telescope data
+  const {
+    entries,
+    stats,
+    isLoading,
+    error,
+    refresh,
+    clearEntries,
+  } = useTelescopeData();
 
-export default function App() {
-  const [entries, setEntries] = useState<TelescopeEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedRequest, setSelectedRequest] = useState<TelescopeEntry | null>(null);
+  /**
+   * Handle entry selection
+   */
+  const handleEntrySelect = (entryId: string) => {
+    const entry = entries.find(e => e.id === entryId);
+    setSelectedEntry(entry || null);
+  };
 
-  useEffect(() => {
-    setLoading(true);
-    fetch('/telescope/api/entries')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch');
-        return res.json();
-      })
-      .then(data => {
-        // Adapter le mapping pour la compatibilité
-        setEntries(
-          data.map((e: any) => ({
-            ...e,
-            // Assurer la compatibilité avec les champs legacy
-            method: e.method || e.request?.method,
-            path: e.path || e.request?.path,
-            statusCode: e.statusCode || e.status || e.response?.statusCode,
-            duration: e.duration || e.response?.responseTime,
-          }))
-        );
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Erreur lors du chargement des requêtes');
-        setLoading(false);
-      });
-  }, []);
+  /**
+   * Handle close details
+   */
+  const handleCloseDetails = () => {
+    setSelectedEntry(null);
+  };
+
+  /**
+   * Handle clear entries
+   */
+  const handleClearEntries = async () => {
+    try {
+      await clearEntries();
+      setSelectedEntry(null);
+    } catch (error) {
+      console.error('Failed to clear entries:', error);
+    }
+  };
 
   return (
-    <SidebarLayout>
-      {loading && <div className="text-center text-gray-500 py-8">Chargement...</div>}
-      {error && <div className="text-center text-red-500 py-8">{error}</div>}
-      {!loading && !error && (
-        <RequestsList
-          requests={entries}
-          onSelect={setSelectedRequest}
-          selectedId={selectedRequest?.id}
-        />
-      )}
-      {selectedRequest && <RequestDetails entry={selectedRequest} />}
-    </SidebarLayout>
+    <div className="h-screen bg-gray-50">
+      <SidebarLayout
+        header={
+          <Header
+            stats={stats}
+            onClearEntries={handleClearEntries}
+            isLoading={isLoading}
+          />
+        }
+        sidebar={
+          <RequestsList
+            entries={entries}
+            selectedEntryId={selectedEntry?.id}
+            onEntrySelect={handleEntrySelect}
+            onClearEntries={handleClearEntries}
+            isLoading={isLoading}
+          />
+        }
+      >
+        {error ? (
+          <ErrorDisplay error={error} onRetry={refresh} />
+        ) : selectedEntry ? (
+          <RequestDetails
+            entry={selectedEntry}
+            onClose={handleCloseDetails}
+          />
+        ) : (
+          <EmptyState />
+        )}
+      </SidebarLayout>
+    </div>
   );
-}
+};
+
+/**
+ * Error Display Component
+ */
+const ErrorDisplay: React.FC<{ error: string; onRetry: () => void }> = ({ error, onRetry }) => (
+  <div className="flex items-center justify-center h-full">
+    <div className="text-center">
+      <div className="mx-auto h-12 w-12 text-red-500 mb-4">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Data</h3>
+      <p className="text-gray-500 mb-4">{error}</p>
+      <button
+        onClick={onRetry}
+        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Retry
+      </button>
+    </div>
+  </div>
+);
+
+/**
+ * Empty State Component
+ */
+const EmptyState: React.FC = () => (
+  <div className="flex items-center justify-center h-full">
+    <div className="text-center">
+      <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-medium text-gray-900 mb-2">No Entry Selected</h3>
+      <p className="text-gray-500">
+        Select an entry from the list to view its details
+      </p>
+    </div>
+  </div>
+);
+
+export default App;

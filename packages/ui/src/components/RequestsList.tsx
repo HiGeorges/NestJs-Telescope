@@ -1,68 +1,272 @@
-import type { TelescopeEntry } from '../App';
+/**
+ * Requests List Component
+ * 
+ * Displays a list of telescope entries with filtering, sorting, and selection capabilities.
+ * Provides a clean interface for browsing HTTP requests and exceptions captured by Telescope.
+ */
 
-interface RequestsListProps {
-  requests: TelescopeEntry[];
-  selectedId?: string;
-  onSelect?: (req: TelescopeEntry) => void;
+import React, { useState, useMemo } from 'react';
+import type { RequestsListProps } from '../types';
+import { Button } from './ui/Button';
+import { HttpMethodBadge, StatusCodeBadge, EntryTypeBadge } from './ui/Badge';
+import { apiUtils } from '../services/api';
+
+/**
+ * Filter options for the requests list
+ */
+interface FilterOptions {
+  /** Filter by entry type */
+  type?: 'request' | 'exception' | 'all';
+  
+  /** Filter by HTTP method */
+  method?: string;
+  
+  /** Filter by status code */
+  statusCode?: number;
+  
+  /** Search term */
+  search?: string;
 }
 
-function statusColor(status: number) {
-  if (status >= 200 && status < 300) return 'bg-green-100 text-green-700';
-  if (status >= 400 && status < 500) return 'bg-yellow-100 text-yellow-700';
-  if (status >= 500) return 'bg-red-100 text-red-700';
-  return 'bg-gray-100 text-gray-700';
-}
+/**
+ * Requests List Component
+ */
+export const RequestsList: React.FC<RequestsListProps> = ({
+  entries,
+  selectedEntryId,
+  onEntrySelect,
+  onClearEntries,
+  isLoading = false,
+}) => {
+  // State for filtering
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    type: 'all',
+    method: '',
+    statusCode: undefined,
+    search: '',
+  });
 
-function methodColor(method: string) {
-  if (method === 'POST') return 'bg-blue-100 text-blue-700';
-  return 'bg-gray-100 text-gray-700';
-}
+  /**
+   * Filter entries based on current options
+   */
+  const filteredEntries = useMemo(() => {
+    const filtered = entries.filter((entry) => {
+      // Filter by type
+      if (filterOptions.type && filterOptions.type !== 'all' && entry.type !== filterOptions.type) {
+        return false;
+      }
 
-export default function RequestsList({ requests, selectedId, onSelect }: RequestsListProps) {
+      // Filter by method (for requests only)
+      if (filterOptions.method && entry.request?.method !== filterOptions.method) {
+        return false;
+      }
+
+      // Filter by status code (for requests only)
+      if (filterOptions.statusCode && entry.response?.statusCode !== filterOptions.statusCode) {
+        return false;
+      }
+
+      // Filter by search term
+      if (filterOptions.search) {
+        const searchTerm = filterOptions.search.toLowerCase();
+        const searchableText = [
+          entry.request?.url || '',
+          entry.request?.method || '',
+          entry.response?.statusCode?.toString() || '',
+          entry.exception?.message || '',
+          entry.exception?.name || '',
+          entry.ip,
+          entry.userAgent,
+        ].join(' ').toLowerCase();
+        
+        if (!searchableText.includes(searchTerm)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    // Sort by timestamp (most recent first)
+    filtered.sort((a, b) => {
+      const aTime = new Date(a.timestamp).getTime();
+      const bTime = new Date(b.timestamp).getTime();
+      return bTime - aTime;
+    });
+
+    return filtered;
+  }, [entries, filterOptions]);
+
+  /**
+   * Handle filter change
+   */
+  const handleFilterChange = (key: keyof FilterOptions, value: string | number | undefined) => {
+    setFilterOptions(prev => ({ ...prev, [key]: value }));
+  };
+
+  /**
+   * Clear all filters
+   */
+  const clearFilters = () => {
+    setFilterOptions({
+      type: 'all',
+      method: '',
+      statusCode: undefined,
+      search: '',
+    });
+  };
+
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="bg-white dark:bg-gray-950 rounded-xl shadow border border-gray-200 dark:border-gray-800 mb-8">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-          <span className="font-semibold text-gray-800 dark:text-gray-100 text-base">Requests</span>
-          {/* Search input peut être ajouté ici si besoin */}
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200 bg-white">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Telescope Entries ({filteredEntries.length})
+          </h2>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={onClearEntries}
+            loading={isLoading}
+            icon={
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            }
+          >
+            Clear All
+          </Button>
         </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
-              <th className="px-6 py-2 text-left font-medium">Verb</th>
-              <th className="px-6 py-2 text-left font-medium">Path</th>
-              <th className="px-6 py-2 text-left font-medium">Status</th>
-              <th className="px-6 py-2 text-left font-medium">Duration</th>
-              <th className="px-6 py-2 text-left font-medium">Timestamp</th>
-              <th className="px-6 py-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map(req => (
-              <tr
-                key={req.id}
-                className={`border-t border-gray-100 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-gray-800 transition cursor-pointer ${selectedId === req.id ? 'bg-blue-50 dark:bg-gray-800' : ''}`}
-                onClick={() => onSelect?.(req)}
+
+        {/* Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Type filter */}
+          <select
+            value={filterOptions.type}
+            onChange={(e) => handleFilterChange('type', e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Types</option>
+            <option value="request">Requests</option>
+            <option value="exception">Exceptions</option>
+          </select>
+
+          {/* Method filter */}
+          <select
+            value={filterOptions.method}
+            onChange={(e) => handleFilterChange('method', e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Methods</option>
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="PATCH">PATCH</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+
+          {/* Status code filter */}
+          <select
+            value={filterOptions.statusCode || ''}
+            onChange={(e) => handleFilterChange('statusCode', e.target.value ? parseInt(e.target.value) : undefined)}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Status Codes</option>
+            <option value="200">200 OK</option>
+            <option value="201">201 Created</option>
+            <option value="400">400 Bad Request</option>
+            <option value="401">401 Unauthorized</option>
+            <option value="404">404 Not Found</option>
+            <option value="500">500 Internal Server Error</option>
+          </select>
+
+          {/* Search */}
+          <input
+            type="text"
+            placeholder="Search..."
+            value={filterOptions.search}
+            onChange={(e) => handleFilterChange('search', e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Clear filters button */}
+        {(filterOptions.type !== 'all' || filterOptions.method || filterOptions.statusCode || filterOptions.search) && (
+          <div className="mt-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="text-gray-600"
+            >
+              Clear Filters
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Entries List */}
+      <div className="flex-1 overflow-y-auto">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : filteredEntries.length === 0 ? (
+          <div className="flex items-center justify-center h-32 text-gray-500">
+            <div className="text-center">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p className="mt-2">No entries found</p>
+            </div>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {filteredEntries.map((entry) => (
+              <div
+                key={entry.id}
+                onClick={() => onEntrySelect(entry.id)}
+                className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                  selectedEntryId === entry.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                }`}
               >
-                <td className="px-6 py-2">
-                  <span className={`px-2 py-0.5 rounded font-bold text-xs ${methodColor(req.method || 'GET')}`}>{req.method || 'GET'}</span>
-                </td>
-                <td className="px-6 py-2 text-gray-800 dark:text-gray-100 font-mono">{req.path}</td>
-                <td className="px-6 py-2">
-                  <span className={`px-2 py-0.5 rounded font-bold text-xs ${statusColor(req.statusCode || 0)}`}>{req.statusCode || 0}</span>
-                </td>
-                <td className="px-6 py-2 text-gray-700 dark:text-gray-300">{req.duration}ms</td>
-                <td className="px-6 py-2 text-gray-500 dark:text-gray-400">
-                  {req.timestamp instanceof Date ? req.timestamp.toISOString() : String(req.timestamp)}
-                </td>
-                <td className="px-6 py-2 text-right">
-                  <span className="i-mdi:chevron-right text-xl text-gray-400" />
-                </td>
-              </tr>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <EntryTypeBadge type={entry.type} size="sm" />
+                      {entry.request && (
+                        <HttpMethodBadge method={entry.request.method} size="sm" />
+                      )}
+                      {entry.response && (
+                        <StatusCodeBadge statusCode={entry.response.statusCode} size="sm" />
+                      )}
+                    </div>
+                    
+                    <div className="text-sm text-gray-900 truncate">
+                      {entry.request?.url || entry.exception?.message || 'No details available'}
+                    </div>
+                    
+                    <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                      <span>{apiUtils.formatTimestamp(entry.timestamp)}</span>
+                      <span>{entry.ip}</span>
+                      {entry.response?.responseTime && (
+                        <span>{apiUtils.formatResponseTime(entry.response.responseTime)}</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="ml-4 flex-shrink-0">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        )}
       </div>
     </div>
   );
-} 
+}; 
