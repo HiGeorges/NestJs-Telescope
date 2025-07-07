@@ -63,7 +63,7 @@ export class TelescopeController {
         try {
           console.log('🔍 Telescope: Trying path:', rootPath);
           res.sendFile('index.html', { root: rootPath });
-          console.log('🔍 Telescope: Successfully served from:', rootPath);
+          console.log('🔍 Telescope: sendFile called, response sent');
           return;
         } catch (fileError) {
           console.log(`🔍 Telescope: Failed to serve from ${rootPath}:`, fileError.message);
