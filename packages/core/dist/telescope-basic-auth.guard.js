@@ -10,12 +10,17 @@ exports.TelescopeBasicAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 let TelescopeBasicAuthGuard = class TelescopeBasicAuthGuard {
     async canActivate(context) {
+        console.log('🔍 Telescope Guard: canActivate called');
         const request = context.switchToHttp().getRequest();
         const response = context.switchToHttp().getResponse();
         const isAuthEnabled = process.env.TELESCOPE_AUTH_ENABLED === 'true';
         const username = process.env.TELESCOPE_USER;
         const password = process.env.TELESCOPE_PASS;
+        console.log('🔍 Telescope Guard: Auth enabled =', isAuthEnabled);
+        console.log('🔍 Telescope Guard: Username configured =', !!username);
+        console.log('🔍 Telescope Guard: Password configured =', !!password);
         if (!isAuthEnabled || !username || !password) {
+            console.log('🔍 Telescope Guard: Auth disabled, allowing access');
             return true;
         }
         const authHeader = request.headers.authorization;
