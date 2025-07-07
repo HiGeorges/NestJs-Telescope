@@ -46,7 +46,6 @@ export class TelescopeController {
   @Get()
   @UseGuards(TelescopeBasicAuthGuard)
   async serveIndex(@Res() res: Response) {
-    console.log('🔍 Telescope: serveIndex called');
     try {
       // Try multiple possible paths for the public directory
       const possiblePaths = [
@@ -56,25 +55,19 @@ export class TelescopeController {
         join(process.cwd(), 'node_modules', 'nestjs-telescope', 'dist', 'public')
       ];
 
-      console.log('🔍 Telescope: __dirname =', __dirname);
-      console.log('🔍 Telescope: process.cwd() =', process.cwd());
-
       for (const rootPath of possiblePaths) {
         try {
-          console.log('🔍 Telescope: Trying path:', rootPath);
           res.sendFile('index.html', { root: rootPath });
-          console.log('🔍 Telescope: sendFile called, response sent');
           return;
         } catch (fileError) {
-          console.log(`🔍 Telescope: Failed to serve from ${rootPath}:`, fileError.message);
+          // console.log(`🔍 Telescope: Failed to serve from ${rootPath}:`, fileError.message);
         }
       }
       
       // If all paths fail, send error
-      console.log('🔍 Telescope: All paths failed');
       res.status(500).send('Telescope interface files not found');
     } catch (error) {
-      console.error('🔍 Telescope: Error serving Telescope index:', error);
+      // console.error('🔍 Telescope: Error serving Telescope index:', error);
       res.status(500).send('Error loading Telescope interface');
     }
   }
