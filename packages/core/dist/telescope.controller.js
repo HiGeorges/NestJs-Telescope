@@ -22,7 +22,6 @@ let TelescopeController = class TelescopeController {
         this.telescopeService = telescopeService;
     }
     async serveIndex(res) {
-        console.log('🔍 Telescope: serveIndex called');
         try {
             const possiblePaths = [
                 (0, path_1.join)(__dirname, '..', 'public'),
@@ -30,24 +29,17 @@ let TelescopeController = class TelescopeController {
                 (0, path_1.join)(process.cwd(), 'node_modules', 'nestjs-telescope', 'packages', 'core', 'public'),
                 (0, path_1.join)(process.cwd(), 'node_modules', 'nestjs-telescope', 'dist', 'public')
             ];
-            console.log('🔍 Telescope: __dirname =', __dirname);
-            console.log('🔍 Telescope: process.cwd() =', process.cwd());
             for (const rootPath of possiblePaths) {
                 try {
-                    console.log('🔍 Telescope: Trying path:', rootPath);
                     res.sendFile('index.html', { root: rootPath });
-                    console.log('🔍 Telescope: sendFile called, response sent');
                     return;
                 }
                 catch (fileError) {
-                    console.log(`🔍 Telescope: Failed to serve from ${rootPath}:`, fileError.message);
                 }
             }
-            console.log('🔍 Telescope: All paths failed');
             res.status(500).send('Telescope interface files not found');
         }
         catch (error) {
-            console.error('🔍 Telescope: Error serving Telescope index:', error);
             res.status(500).send('Error loading Telescope interface');
         }
     }

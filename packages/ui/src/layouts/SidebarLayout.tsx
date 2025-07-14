@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import type { SidebarLayoutProps } from '../types';
+import { Link, useLocation } from 'react-router-dom';
+import { LayoutDashboard, List, AlertTriangle, Settings } from 'lucide-react';
 
-export default function SidebarLayout({ children, header, sidebar }: SidebarLayoutProps) {
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+export default function SidebarLayout({ children, header }: { children: React.ReactNode; header?: React.ReactNode }) {
+  const [theme] = useState(() => localStorage.getItem('theme') || 'dark');
+  const location = useLocation();
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -13,28 +15,34 @@ export default function SidebarLayout({ children, header, sidebar }: SidebarLayo
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  const navLinks = [
+    { to: '/', label: 'Requests', icon: List },
+    { to: '/exceptions', label: 'Exceptions', icon: AlertTriangle },
+    { to: '/settings', label: 'Settings', icon: Settings },
+  ];
+
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Sidebar */}
-      <aside className="w-80 min-w-[320px] bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col shadow-sm z-10">
-        <div className="flex items-center gap-2 text-2xl font-bold text-blue-600 py-6 pl-8 tracking-wide select-none">
-          <span className="i-mdi:telescope text-3xl" />
-          Telescope
+      <aside className="w-72 min-w-[260px] bg-gray-950 border-r border-gray-800 flex flex-col shadow-sm z-10">
+        <div className="flex items-center gap-3 text-2xl font-bold text-white py-6 pl-8 tracking-wide select-none">
+          <span className="bg-blue-600 text-white rounded-full p-2"><LayoutDashboard size={28} /></span>
+          NestJS Telescope
         </div>
-        <div className="flex-1 overflow-hidden">
-          {sidebar}
-        </div>
-        <div className="mt-auto flex justify-center py-4">
-          <button
-            className="text-2xl text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition"
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            aria-label="Switch theme"
-          >
-            {theme === 'light' ? '🌙' : '☀️'}
-          </button>
-        </div>
+        <nav className="flex-1 flex flex-col gap-2 px-4">
+          {navLinks.map(({ to, label, icon: Icon }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`flex items-center gap-3 px-4 py-2 rounded-lg font-medium text-base transition-colors
+                ${location.pathname === to ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}
+            >
+              <Icon size={20} />
+              {label}
+            </Link>
+          ))}
+        </nav>
       </aside>
-      
       {/* Main Content */}
       <main className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900 min-w-0">
         {header}

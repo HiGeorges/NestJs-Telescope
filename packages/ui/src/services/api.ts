@@ -196,3 +196,29 @@ export const apiUtils = {
     return `${(time / 1000).toFixed(2)}s`;
   },
 }; 
+
+const API_BASE = '/telescope/api';
+
+export async function getEntries() {
+  const res = await fetch(`${API_BASE}/entries`);
+  if (!res.ok) throw new Error('Failed to fetch entries');
+  return res.json();
+}
+
+export async function getEntry(id: string) {
+  const res = await fetch(`${API_BASE}/entries/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch entry');
+  return res.json();
+}
+
+export async function clearEntries() {
+  const res = await fetch(`${API_BASE}/entries`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to clear entries');
+  return res.json();
+}
+
+export async function getStats() {
+  const res = await fetch(`${API_BASE}/stats`);
+  if (!res.ok) throw new Error('Failed to fetch stats');
+  return res.json();
+} 

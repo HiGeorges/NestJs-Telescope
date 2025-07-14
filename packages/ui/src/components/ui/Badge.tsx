@@ -6,8 +6,6 @@
  * Supports different variants and sizes with TypeScript support.
  */
 
-import React from 'react';
-
 /**
  * Badge variant types
  */

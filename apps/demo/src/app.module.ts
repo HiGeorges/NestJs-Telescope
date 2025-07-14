@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TelescopeModule } from '@telescope/core';
+import { TelescopeModule } from 'nestjs-telescope';
 
 @Module({
-  imports: [
-    TelescopeModule,
-  ],
+  imports: [TelescopeModule],
   controllers: [AppController],
   providers: [AppService],
 })

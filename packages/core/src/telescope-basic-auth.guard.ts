@@ -20,7 +20,6 @@ export class TelescopeBasicAuthGuard implements CanActivate {
    * @returns Promise<boolean> - True if authentication passes or is disabled
    */
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('🔍 Telescope Guard: canActivate called');
     const request = context.switchToHttp().getRequest<Request>();
     const response = context.switchToHttp().getResponse<Response>();
 
@@ -29,13 +28,8 @@ export class TelescopeBasicAuthGuard implements CanActivate {
     const username = process.env.TELESCOPE_USER;
     const password = process.env.TELESCOPE_PASS;
 
-    console.log('🔍 Telescope Guard: Auth enabled =', isAuthEnabled);
-    console.log('🔍 Telescope Guard: Username configured =', !!username);
-    console.log('🔍 Telescope Guard: Password configured =', !!password);
-
-    // If auth is disabled or credentials are not configured, allow access
+    // If auth is disabled ou credentials are not configured, allow access
     if (!isAuthEnabled || !username || !password) {
-      console.log('🔍 Telescope Guard: Auth disabled, allowing access');
       return true;
     }
 

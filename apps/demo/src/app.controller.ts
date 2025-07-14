@@ -9,9 +9,4 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-
-  @Get('test-telescope')
-  testTelescope() {
-    return { message: 'Telescope module is working!' };
-  }
 }

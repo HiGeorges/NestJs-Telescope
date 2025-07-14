@@ -4,6 +4,7 @@ A powerful debugging and monitoring tool for NestJS applications, inspired by La
 
 ## 🚀 Features
 
+- **Invisible Integration** - No routes are logged at startup, all Telescope endpoints are handled via an internal Express middleware for maximum discretion.
 - **Real-time HTTP Request Monitoring** - Track all incoming requests with detailed information
 - **Exception Tracking** - Capture and display exceptions with stack traces
 - **Beautiful Web Interface** - Modern, responsive UI with real-time updates
@@ -24,16 +25,15 @@ npm install @telescope/core
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { TelescopeModule } from '@telescope/core';
+import { TelescopeModule } from 'nestjs-telescope';
 
 @Module({
-  imports: [
-    TelescopeModule,
-  ],
-  // ... other modules
+  imports: [TelescopeModule],
 })
 export class AppModule {}
 ```
+
+> **Note:** No controller is exposed, and no Telescope routes are logged at startup. All endpoints are handled internally and remain invisible to the NestJS router logs.
 
 ### 2. Access the Interface
 

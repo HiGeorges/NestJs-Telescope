@@ -7,7 +7,6 @@
 
 // Core exports
 export { NestTelescopeModule as TelescopeModule } from './nest-telescope.module';
-export { TelescopeController } from './telescope.controller';
 export { TelescopeService } from './telescope.service';
 export { TelescopeInterceptor } from './telescope.interceptor';
 export { TelescopeBasicAuthGuard } from './telescope-basic-auth.guard';

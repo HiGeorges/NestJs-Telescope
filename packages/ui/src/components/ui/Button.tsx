@@ -5,7 +5,6 @@
  * Supports different variants, sizes, and states for consistent UI design.
  */
 
-import React from 'react';
 import type { ButtonHTMLAttributes } from 'react';
 
 /**
