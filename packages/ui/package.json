@@ -1,7 +1,7 @@
 {
   "name": "@nestjs-telescope/ui",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.10",
   "type": "module",
   "description": "React UI for NestJS Telescope debugging tool",
   "keywords": [
