@@ -1,11 +1,3 @@
-/**
- * Telescope Entry Types
- * 
- * Defines the structure of telescope entries captured by the NestJS backend.
- * These types represent HTTP requests, responses, and exceptions that are
- * monitored and displayed in the Telescope UI.
- */
-
 export interface TelescopeEntry {
   /** Unique identifier for the entry */
   id: string;
@@ -120,10 +112,6 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-/**
- * UI Component Props Types
- */
-
 export interface RequestsListProps {
   /** Array of telescope entries to display */
   entries: TelescopeEntry[];
@@ -171,10 +159,6 @@ export interface SidebarLayoutProps {
   children: React.ReactNode;
 }
 
-/**
- * API Service Types
- */
-
 export interface TelescopeApiService {
   /** Get all entries */
   getEntries(): Promise<TelescopeEntry[]>;
@@ -188,10 +172,6 @@ export interface TelescopeApiService {
   /** Clear all entries */
   clearEntries(): Promise<void>;
 }
-
-/**
- * Hook Types
- */
 
 export interface UseTelescopeDataReturn {
   /** All telescope entries */

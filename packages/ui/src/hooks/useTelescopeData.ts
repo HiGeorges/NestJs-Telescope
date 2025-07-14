@@ -1,18 +1,7 @@
-/**
- * Telescope Data Hook
- * 
- * Custom React hook for managing telescope data state, including
- * auto-refresh functionality, error handling, and data management.
- * Provides a clean interface for components to interact with telescope data.
- */
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { UseTelescopeDataReturn, TelescopeEntry, TelescopeStats } from '../types';
 import { telescopeApi } from '../services/api';
 
-/**
- * Configuration for the hook
- */
 const HOOK_CONFIG = {
   /** Auto-refresh interval in milliseconds */
   AUTO_REFRESH_INTERVAL: 5000,
@@ -24,9 +13,6 @@ const HOOK_CONFIG = {
   INITIAL_ERROR: null,
 } as const;
 
-/**
- * Custom hook for managing telescope data
- */
 export function useTelescopeData(): UseTelescopeDataReturn {
   // State management
   const [entries, setEntries] = useState<TelescopeEntry[]>([]);

@@ -1,10 +1,3 @@
-/**
- * Button Component
- * 
- * A reusable button component with TypeScript support and Tailwind CSS styling.
- * Supports different variants, sizes, and states for consistent UI design.
- */
-
 import type { ButtonHTMLAttributes } from 'react';
 
 /**

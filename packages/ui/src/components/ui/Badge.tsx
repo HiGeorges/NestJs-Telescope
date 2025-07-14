@@ -1,12 +1,4 @@
 /**
- * Badge Component
- * 
- * A reusable badge component for displaying status indicators,
- * HTTP methods, status codes, and other small pieces of information.
- * Supports different variants and sizes with TypeScript support.
- */
-
-/**
  * Badge variant types
  */
 export type BadgeVariant = 

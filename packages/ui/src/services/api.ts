@@ -1,20 +1,9 @@
-/**
- * Telescope API Service
- * 
- * Handles all communication with the NestJS Telescope backend.
- * Provides a clean interface for fetching telescope entries, statistics,
- * and managing the telescope data.
- */
-
 import type { 
   TelescopeEntry, 
   TelescopeStats, 
   TelescopeApiService
 } from '../types';
 
-/**
- * Configuration for the API service
- */
 const API_CONFIG = {
   /** Base URL for the telescope API */
   BASE_URL: '/telescope/api',
@@ -26,9 +15,6 @@ const API_CONFIG = {
   AUTO_REFRESH_INTERVAL: 5000,
 } as const;
 
-/**
- * HTTP client for making API requests
- */
 class HttpClient {
   private baseURL: string;
   private timeout: number;
@@ -77,9 +63,6 @@ class HttpClient {
   }
 }
 
-/**
- * Implementation of the Telescope API Service
- */
 export class TelescopeApiServiceImpl implements TelescopeApiService {
   private httpClient: HttpClient;
 
@@ -143,59 +126,6 @@ export class TelescopeApiServiceImpl implements TelescopeApiService {
  * Singleton instance of the API service
  */
 export const telescopeApi = new TelescopeApiServiceImpl();
-
-/**
- * Utility functions for API operations
- */
-export const apiUtils = {
-  /**
-   * Format timestamp for display
-   */
-  formatTimestamp(timestamp: string): string {
-    return new Date(timestamp).toLocaleString();
-  },
-
-  /**
-   * Get status code color class
-   */
-  getStatusColor(statusCode: number): string {
-    if (statusCode >= 200 && statusCode < 300) return 'text-green-600';
-    if (statusCode >= 300 && statusCode < 400) return 'text-blue-600';
-    if (statusCode >= 400 && statusCode < 500) return 'text-yellow-600';
-    if (statusCode >= 500) return 'text-red-600';
-    return 'text-gray-600';
-  },
-
-  /**
-   * Get method color class
-   */
-  getMethodColor(method: string): string {
-    const methodColors: Record<string, string> = {
-      GET: 'bg-blue-100 text-blue-800',
-      POST: 'bg-green-100 text-green-800',
-      PUT: 'bg-yellow-100 text-yellow-800',
-      PATCH: 'bg-orange-100 text-orange-800',
-      DELETE: 'bg-red-100 text-red-800',
-    };
-    return methodColors[method.toUpperCase()] || 'bg-gray-100 text-gray-800';
-  },
-
-  /**
-   * Truncate text for display
-   */
-  truncateText(text: string, maxLength: number = 100): string {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-  },
-
-  /**
-   * Format response time
-   */
-  formatResponseTime(time: number): string {
-    if (time < 1000) return `${time}ms`;
-    return `${(time / 1000).toFixed(2)}s`;
-  },
-}; 
 
 const API_BASE = '/telescope/api';
 

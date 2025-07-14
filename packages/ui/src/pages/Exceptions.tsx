@@ -1,44 +1,47 @@
 import { useState, useEffect } from 'react';
+import type { TelescopeEntry } from '../types';
 import { EntryTable } from '../components/EntryTable';
 import type { EntryTableColumn } from '../components/EntryTable';
 import { EntryFilters } from '../components/EntryFilters';
-import ExceptionDetailModal from '../components/ExceptionDetailModal';
 import { Badge } from '../components/ui/Badge';
 import { formatDistanceToNow } from 'date-fns';
+import ExceptionDetailModal from '../components/ExceptionDetailModal';
 
-// Mock data for demonstration
-const mockExceptions = [
-  {
-    id: 'e1',
-    name: 'NotFoundException',
-    message: 'User not found',
-    status: 404,
-    timestamp: new Date(Date.now() - 1000 * 60 * 5),
-    ip: '192.168.1.200',
-    stack: 'Error: User not found\n    at ...',
-    context: { userId: 123 },
-  },
-  {
-    id: 'e2',
-    name: 'UnauthorizedException',
-    message: 'Invalid token',
-    status: 401,
-    timestamp: new Date(Date.now() - 1000 * 60 * 10),
-    ip: '192.168.1.201',
-    stack: 'Error: Invalid token\n    at ...',
-    context: { token: '***' },
-  },
-  {
-    id: 'e3',
-    name: 'InternalServerError',
-    message: 'Database connection failed',
-    status: 500,
-    timestamp: new Date(Date.now() - 1000 * 60 * 20),
-    ip: '192.168.1.202',
-    stack: 'Error: Database connection failed\n    at ...',
-    context: { db: 'main' },
-  },
-];
+// Loads exceptions from the API and provides loading/error state
+function useExceptionsData() {
+  const [exceptions, setExceptions] = useState<ExceptionListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch('/telescope/api/entries')
+      .then(res => res.json())
+      .then(data => {
+        // Filter and adapt exceptions from the API response
+        const exceptions = (data as TelescopeEntry[] || [])
+          .filter((e) => e.type === 'exception')
+          .map((e) => ({
+            id: e.id,
+            name: e.exception?.name || 'Exception',
+            message: e.exception?.message || '',
+            status: typeof e.exception?.context?.statusCode === 'number' ? e.exception.context.statusCode : 500,
+            timestamp: new Date(e.timestamp),
+            ip: typeof (e.request && (e.request as any).ip) === 'string' ? (e.request as any).ip : '',
+            stack: e.exception?.stack || '',
+            context: e.exception?.context || {},
+          }));
+        setExceptions(exceptions);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to load exceptions');
+        setLoading(false);
+      });
+  }, []);
+
+  return { exceptions, loading, error };
+}
 
 const filterOptions = [
   {
@@ -51,7 +54,18 @@ const filterOptions = [
   },
 ];
 
-const columns: EntryTableColumn<typeof mockExceptions[0]>[] = [
+type ExceptionListItem = {
+  id: string;
+  name: string;
+  message: string;
+  status: number;
+  timestamp: Date;
+  ip: string;
+  stack: string;
+  context: Record<string, unknown>;
+};
+
+const columns: EntryTableColumn<ExceptionListItem>[] = [
   {
     label: 'Name',
     accessor: 'name',
@@ -83,9 +97,9 @@ const columns: EntryTableColumn<typeof mockExceptions[0]>[] = [
 ];
 
 export default function Exceptions() {
-  const [exceptions] = useState(mockExceptions);
-  const [filteredExceptions, setFilteredExceptions] = useState(mockExceptions);
-  const [selectedException, setSelectedException] = useState<typeof mockExceptions[0] | null>(null);
+  const { exceptions, loading, error } = useExceptionsData();
+  const [filteredExceptions, setFilteredExceptions] = useState<ExceptionListItem[]>([]);
+  const [selectedException, setSelectedException] = useState<ExceptionListItem | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [filters, setFilters] = useState({ status: undefined });
 
@@ -108,7 +122,7 @@ export default function Exceptions() {
   const handleClearAllFilters = () => {
     setFilters({ status: undefined });
   };
-  const handleExceptionClick = (exception: typeof mockExceptions[0]) => {
+  const handleExceptionClick = (exception: ExceptionListItem) => {
     setSelectedException(exception);
     setIsDetailModalOpen(true);
   };
@@ -119,22 +133,28 @@ export default function Exceptions() {
         <h1 className="text-2xl font-bold text-white">Exceptions</h1>
       </div>
       <div className="p-6">
-        <EntryFilters
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onClearAll={handleClearAllFilters}
-          filterOptions={filterOptions}
-        />
-        <EntryTable
-          entries={filteredExceptions}
-          columns={columns}
-          onRowClick={handleExceptionClick}
-        />
-        <ExceptionDetailModal
-          exception={selectedException}
-          open={isDetailModalOpen}
-          onClose={() => setIsDetailModalOpen(false)}
-        />
+        {loading && <div className="text-gray-400">Loading exceptions...</div>}
+        {error && <div className="text-red-500">{error}</div>}
+        {!loading && !error && (
+          <>
+            <EntryFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onClearAll={handleClearAllFilters}
+              filterOptions={filterOptions}
+            />
+            <EntryTable
+              entries={filteredExceptions}
+              columns={columns}
+              onRowClick={handleExceptionClick}
+            />
+            <ExceptionDetailModal
+              exception={selectedException}
+              open={isDetailModalOpen}
+              onClose={() => setIsDetailModalOpen(false)}
+            />
+          </>
+        )}
       </div>
     </div>
   );

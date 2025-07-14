@@ -1,6 +1,5 @@
 import type { HeaderProps } from '../types';
 import { Button } from '../components/ui/Button';
-import { apiUtils } from '../services/api';
 
 export default function Header({ stats, onClearEntries, isLoading = false }: HeaderProps) {
   return (
@@ -28,7 +27,7 @@ export default function Header({ stats, onClearEntries, isLoading = false }: Hea
           {stats.averageResponseTime > 0 && (
             <div className="flex items-center space-x-1">
               <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
-              <span>{apiUtils.formatResponseTime(stats.averageResponseTime)} avg</span>
+              <span>{formatResponseTime(stats.averageResponseTime)} avg</span>
             </div>
           )}
         </div>
@@ -51,4 +50,10 @@ export default function Header({ stats, onClearEntries, isLoading = false }: Hea
       </div>
     </header>
   );
+} 
+
+// Helper to format response time
+function formatResponseTime(time: number): string {
+  if (time < 1000) return `${time}ms`;
+  return `${(time / 1000).toFixed(2)}s`;
 } 
