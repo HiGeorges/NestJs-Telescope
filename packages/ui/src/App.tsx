@@ -11,7 +11,6 @@ const App: React.FC = () => (
         <Route path="/telescope" element={<Requests />} />
         <Route path="/requests" element={<Requests />} />
         <Route path="/exceptions" element={<Exceptions />} />
-
       </Routes>
     </SidebarLayout>
   </Router>
