@@ -19,9 +19,9 @@ A powerful debugging and monitoring tool for NestJS applications, inspired by La
 npm install @telescope/core
 ```
 
-## 🔧 Quick Start
+## ⚡ Quick Start
 
-### 1. Import the Module
+1. **Import the Module** in your AppModule:
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -33,9 +33,22 @@ import { TelescopeModule } from 'nestjs-telescope';
 export class AppModule {}
 ```
 
-> **Note:** No controller is exposed, and no Telescope routes are logged at startup. All endpoints are handled internally and remain invisible to the NestJS router logs.
+2. **Call the static setup method** in your `main.ts` after creating the app:
 
-### 2. Access the Interface
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { TelescopeModule } from 'nestjs-telescope';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  TelescopeModule.setup(app);
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+3. **Access the Interface**
 
 Start your application and visit:
 ```
@@ -70,35 +83,13 @@ TELESCOPE_PASS=secret123
 
 ## 📊 API Endpoints
 
-### GET /telescope
-Serves the web interface.
-
-### GET /telescope/api/entries
-Returns all captured requests and exceptions.
-
-### GET /telescope/api/stats
-Returns statistics about captured data.
+- **GET /telescope** — Serves the web interface
+- **GET /telescope/api/entries** — Returns all captured requests and exceptions
+- **GET /telescope/api/stats** — Returns statistics about captured data
 
 ## 🛠️ Advanced Usage
 
-### Custom Configuration
-
-```typescript
-import { Module } from '@nestjs/common';
-import { TelescopeModule } from '@telescope/core';
-
-@Module({
-  imports: [
-    TelescopeModule,
-  ],
-  providers: [
-    // Your custom providers
-  ],
-})
-export class AppModule {}
-```
-
-### Programmatic Access
+You can still use the `TelescopeService` programmatically if needed:
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -160,5 +151,4 @@ This project is licensed under the MIT License - see the [LICENSE](../../LICENSE
 - **Issues**: [GitHub Issues](https://github.com/HiGeorges/NestJs-Telescope/issues)
 - **Documentation**: [Full Documentation](https://github.com/HiGeorges/NestJs-Telescope/wiki)
 - **Discussions**: [GitHub Discussions](https://github.com/HiGeorges/NestJs-Telescope/discussions)
-- **Email**: georges.heloussato@epitech.eu
-- **Author**: [HiGeorges](https://github.com/HiGeorges) 
+- **Email**: georges.heloussato@epitech.eu 
