@@ -26,24 +26,43 @@ A powerful debugging and monitoring tool for NestJS applications, inspired by La
 npm install nestjs-telescope
 ```
 
-### Basic Setup
+### Super Simple Setup ✨
+
+Just add **one line** to your `main.ts` - that's it!
 
 ```typescript
-import { Module } from '@nestjs/common';
+// main.ts
+import { NestFactory } from '@nestjs/common';
+import { AppModule } from './app.module';
 import { TelescopeModule } from 'nestjs-telescope';
 
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  
+  // 🔭 One line setup - magic!
+  TelescopeModule.setup(app);
+  
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+**No module imports needed!** Your `AppModule` stays unchanged:
+
+```typescript
+// app.module.ts - No changes required!
+import { Module } from '@nestjs/common';
+
 @Module({
-  imports: [
-    TelescopeModule,
-    // ... your other modules
-  ],
+  imports: [], // No need to import TelescopeModule
+  // ... your controllers and providers
 })
 export class AppModule {}
 ```
 
 ### Access the Dashboard
 
-Once configured, visit `http://localhost:3000/telescope` to access the debugging interface.
+Visit `http://localhost:3000/telescope` and start debugging! 🎉
 
 ## 📖 Documentation
 
@@ -67,22 +86,23 @@ interface TelescopeConfig {
 }
 ```
 
-### Advanced Usage
+### Alternative Setup (Legacy)
+
+If you prefer the traditional module import approach:
 
 ```typescript
+// app.module.ts
 import { Module } from '@nestjs/common';
 import { TelescopeModule } from 'nestjs-telescope';
 
 @Module({
-  imports: [
-    TelescopeModule,
-  ],
-  providers: [
-    // Your custom providers
-  ],
+  imports: [TelescopeModule],
+  // ... your providers
 })
 export class AppModule {}
 ```
+
+> ⚠️ **Note**: Use either `TelescopeModule.setup(app)` OR module import, not both!
 
 ### API Endpoints
 
@@ -101,6 +121,25 @@ The module provides the following REST endpoints:
 - **API Testing**: Inspect request/response data for testing
 - **Performance Analysis**: Analyze response times and bottlenecks
 - **Security Auditing**: Monitor suspicious requests and patterns
+
+## 🚀 Production Ready
+
+### ✅ What's New in v1.0.12
+
+- **🔧 Zero-config setup**: Just `TelescopeModule.setup(app)` and you're done!
+- **🎨 Fixed production UI**: No more blank screens in production environments
+- **📦 Enhanced asset serving**: Works with Docker, serverless, and all deployment types
+- **⚡ Better performance**: Optimized middleware and asset caching
+- **🛡️ Improved security**: Better header sanitization and error handling
+
+### 🌐 Production Deployment
+
+Telescope now works seamlessly in production across all environments:
+
+- ✅ **Docker containers** - Assets served from correct paths
+- ✅ **Serverless** (AWS Lambda, Vercel, etc.) - Bundled assets
+- ✅ **Traditional servers** - npm package resolution
+- ✅ **CDN/static hosting** - Proper MIME types and caching headers
 
 ## 🛠️ Development
 

@@ -16,14 +16,53 @@ A powerful debugging and monitoring tool for NestJS applications, inspired by La
 ## 📦 Installation
 
 ```bash
-npm install @telescope/core
+npm install nestjs-telescope
 ```
 
 ## ⚡ Quick Start
 
-1. **Import the Module** in your AppModule:
+**Super Simple Setup** - Just one line in your `main.ts`:
 
 ```typescript
+// main.ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { TelescopeModule } from 'nestjs-telescope';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  
+  // 🔭 Magic one-liner setup!
+  TelescopeModule.setup(app);
+  
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+**No module imports needed!** Your `AppModule` stays clean:
+
+```typescript
+// app.module.ts - No changes required!
+import { Module } from '@nestjs/common';
+
+@Module({
+  imports: [], // TelescopeModule auto-configures itself
+  // ... your controllers and providers
+})
+export class AppModule {}
+```
+
+**Access the Interface**
+
+Visit `http://localhost:3000/telescope` and enjoy debugging! 🎉
+
+### Alternative Setup (Legacy)
+
+If you prefer the traditional module approach:
+
+```typescript
+// app.module.ts
 import { Module } from '@nestjs/common';
 import { TelescopeModule } from 'nestjs-telescope';
 
@@ -33,29 +72,7 @@ import { TelescopeModule } from 'nestjs-telescope';
 export class AppModule {}
 ```
 
-2. **Call the static setup method** in your `main.ts` after creating the app:
-
-```typescript
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { TelescopeModule } from 'nestjs-telescope';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  TelescopeModule.setup(app);
-  await app.listen(3000);
-}
-bootstrap();
-```
-
-3. **Access the Interface**
-
-Start your application and visit:
-```
-http://localhost:3000/telescope
-```
-
-That's it! You'll see a beautiful interface showing all your HTTP requests and exceptions in real-time.
+> ⚠️ **Important**: Use either `TelescopeModule.setup(app)` OR module import, not both!
 
 ## 🔐 Authentication (Optional)
 
