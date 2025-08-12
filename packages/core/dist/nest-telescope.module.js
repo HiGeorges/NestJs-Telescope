@@ -8,8 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var TelescopeModule_1;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NestTelescopeModule = void 0;
+exports.TelescopeModule = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const core_2 = require("@nestjs/core");
@@ -43,13 +44,24 @@ function telescopeMiddlewareFactory(telescopeService) {
             const possiblePaths = [
                 join(__dirname, '..', 'public'),
                 join(__dirname, 'public'),
+                join(process.cwd(), 'node_modules', 'nestjs-telescope', 'public'),
+                join(process.cwd(), 'node_modules', 'nestjs-telescope', 'dist', 'public'),
                 join(process.cwd(), 'node_modules', 'nestjs-telescope', 'packages', 'core', 'public'),
-                join(process.cwd(), 'node_modules', 'nestjs-telescope', 'dist', 'public')
+                join('/app', 'node_modules', 'nestjs-telescope', 'public'),
+                join('/app', 'node_modules', 'nestjs-telescope', 'dist', 'public'),
+                join(__dirname, '..', '..', 'public'),
+                join(__dirname, '..', '..', 'dist', 'public')
             ];
             for (const rootPath of possiblePaths) {
-                if (existsSync(join(rootPath, 'index.html'))) {
+                const htmlPath = join(rootPath, 'index.html');
+                if (existsSync(htmlPath)) {
+                    res.setHeader('Content-Type', 'text/html');
+                    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
                     return res.sendFile('index.html', { root: rootPath });
                 }
+            }
+            if (process.env.NODE_ENV !== 'production') {
+                console.warn('Telescope UI files not found. Checked paths:', possiblePaths);
             }
             return res.status(500).send('Telescope interface files not found');
         }
@@ -60,11 +72,25 @@ function telescopeMiddlewareFactory(telescopeService) {
             const possiblePaths = [
                 join(__dirname, '..', 'public', 'assets'),
                 join(__dirname, 'public', 'assets'),
+                join(process.cwd(), 'node_modules', 'nestjs-telescope', 'public', 'assets'),
+                join(process.cwd(), 'node_modules', 'nestjs-telescope', 'dist', 'public', 'assets'),
                 join(process.cwd(), 'node_modules', 'nestjs-telescope', 'packages', 'core', 'public', 'assets'),
-                join(process.cwd(), 'node_modules', 'nestjs-telescope', 'dist', 'public', 'assets')
+                join('/app', 'node_modules', 'nestjs-telescope', 'public', 'assets'),
+                join('/app', 'node_modules', 'nestjs-telescope', 'dist', 'public', 'assets'),
+                join(__dirname, '..', '..', 'public', 'assets'),
+                join(__dirname, '..', '..', 'dist', 'public', 'assets')
             ];
             for (const rootPath of possiblePaths) {
-                if (existsSync(join(rootPath, assetPath))) {
+                const fullAssetPath = join(rootPath, assetPath);
+                if (existsSync(fullAssetPath)) {
+                    const ext = assetPath.split('.').pop()?.toLowerCase();
+                    if (ext === 'css') {
+                        res.setHeader('Content-Type', 'text/css');
+                    }
+                    else if (ext === 'js') {
+                        res.setHeader('Content-Type', 'application/javascript');
+                    }
+                    res.setHeader('Cache-Control', 'public, max-age=31536000');
                     return res.sendFile(assetPath, { root: rootPath });
                 }
             }
@@ -94,29 +120,60 @@ function telescopeMiddlewareFactory(telescopeService) {
         return res.status(404).send('Not found');
     };
 }
-let NestTelescopeModule = class NestTelescopeModule {
+let TelescopeModule = TelescopeModule_1 = class TelescopeModule {
     constructor(moduleRef, httpAdapterHost) {
         this.moduleRef = moduleRef;
         this.httpAdapterHost = httpAdapterHost;
     }
     onModuleInit() {
-        const app = this.httpAdapterHost?.httpAdapter?.getInstance?.();
-        const telescopeService = this.moduleRef.get(telescope_service_1.TelescopeService, { strict: false });
-        if (app && typeof app.use === 'function' && telescopeService) {
-            app.use(telescopeMiddlewareFactory(telescopeService));
+        if (!process.env.TELESCOPE_STANDALONE_SETUP) {
+            const app = this.httpAdapterHost?.httpAdapter?.getInstance?.();
+            const telescopeService = this.moduleRef.get(telescope_service_1.TelescopeService, { strict: false });
+            if (app && typeof app.use === 'function' && telescopeService) {
+                app.use(telescopeMiddlewareFactory(telescopeService));
+            }
         }
     }
     static setup(app) {
+        process.env.TELESCOPE_STANDALONE_SETUP = 'true';
         const httpAdapter = app.getHttpAdapter?.();
         const instance = httpAdapter?.getInstance?.();
-        const telescopeService = app.get?.(require('./telescope.service').TelescopeService, { strict: false });
-        if (instance && typeof instance.use === 'function') {
-            instance.use(telescopeMiddlewareFactory(telescopeService));
+        try {
+            const { TelescopeService } = require('./telescope.service');
+            const telescopeService = new TelescopeService();
+            const { TelescopeInterceptor } = require('./telescope.interceptor');
+            const { TelescopeExceptionFilter } = require('./telescope-exception.filter');
+            app.useGlobalInterceptors(new TelescopeInterceptor(telescopeService));
+            app.useGlobalFilters(new TelescopeExceptionFilter(telescopeService));
+            if (instance && typeof instance.use === 'function') {
+                instance.use(telescopeMiddlewareFactory(telescopeService));
+            }
+        }
+        catch (error) {
+            console.warn('Failed to setup Telescope:', error.message);
         }
     }
+    static forRoot() {
+        return {
+            module: TelescopeModule_1,
+            providers: [
+                telescope_service_1.TelescopeService,
+                telescope_basic_auth_guard_1.TelescopeBasicAuthGuard,
+                {
+                    provide: core_2.APP_INTERCEPTOR,
+                    useClass: telescope_interceptor_1.TelescopeInterceptor,
+                },
+                {
+                    provide: core_2.APP_FILTER,
+                    useClass: telescope_exception_filter_1.TelescopeExceptionFilter,
+                },
+            ],
+            exports: [telescope_service_1.TelescopeService],
+        };
+    }
 };
-exports.NestTelescopeModule = NestTelescopeModule;
-exports.NestTelescopeModule = NestTelescopeModule = __decorate([
+exports.TelescopeModule = TelescopeModule;
+exports.TelescopeModule = TelescopeModule = TelescopeModule_1 = __decorate([
     (0, common_1.Module)({
         providers: [
             telescope_service_1.TelescopeService,
@@ -130,8 +187,9 @@ exports.NestTelescopeModule = NestTelescopeModule = __decorate([
                 useClass: telescope_exception_filter_1.TelescopeExceptionFilter,
             },
         ],
+        exports: [telescope_service_1.TelescopeService],
     }),
     __metadata("design:paramtypes", [core_1.ModuleRef,
         core_1.HttpAdapterHost])
-], NestTelescopeModule);
+], TelescopeModule);
 //# sourceMappingURL=nest-telescope.module.js.map
