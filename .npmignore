@@ -11,7 +11,7 @@ yarn-error.log*
 # Build artifacts
 dist/
 build/
-*.tsbuildinfo
+*.tsbuildinfo`
 
 # Dependencies
 node_modules/
@@ -90,4 +90,4 @@ packages/ui/package.json
 packages/ui/README.md
 
 # Keep only the built UI files
-!packages/core/public/ 
+!packages/core/public/
